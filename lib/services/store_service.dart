@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class StoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -30,28 +29,36 @@ class StoreService {
   }
 
   // Função para recuperar todos os compromissos/lembretes do usuário
-  Future<Map<String, dynamic>?> getAgenda(String userId) async {
-  try {
-    // Referência à coleção "agenda"
-    final querySnapshot = await _firestore
+  Future<List<Map<String, dynamic>>> getCompromissos(String userId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('agenda')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id, // ID do documento (opcional)
+          'userId': data['userId'],
+          'data': data['data'], // Já é um Timestamp
+          'disciplina': data['disciplina'],
+          'compromisso': data['compromisso'],
+          'lembrete': data['lembrete'],
+          'cor': data['cor'],
+        };
+      }).toList();
+    } catch (e) {
+      print('Erro ao buscar compromissos: $e');
+      throw Exception('Erro ao buscar compromissos');
+    }
+  }
+
+  // Função para retornar um Stream de compromissos/lembretes do usuário
+  Stream<QuerySnapshot> getCompromissosStream(String userId) {
+    return _firestore
         .collection('agenda')
         .where('userId', isEqualTo: userId)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      // Obtem o primeiro documento encontrado
-      final document = querySnapshot.docs.first;
-
-      // Retorna os dados do documento como um mapa
-      return document.data();
-    } else {
-      print('Nenhum compromisso encontrado para o usuário $userId.');
-      return null; // Retorna null se nenhum documento for encontrado
-    }
-  } catch (e) {
-    print('Erro ao buscar compromisso: $e');
-    throw Exception('Erro ao buscar compromisso');
+        .snapshots();
   }
-}
-
 }

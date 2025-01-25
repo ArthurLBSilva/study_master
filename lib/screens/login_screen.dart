@@ -77,6 +77,55 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 child: Text('Cadastrar'),
               ),
+              ElevatedButton(
+                onPressed: () async {
+                  final userCredential = await AuthService().signInWithGoogle();
+                  if (userCredential != null) {
+                    final user = userCredential.user;
+                    if (user != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SignUpScreen(), // Substitua pelo destino após login
+                        ),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content:
+                              Text('Login com Google cancelado ou falhou.')),
+                    );
+                  }
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/google_logo.png', // Certifique-se de configurar o asset
+                      height: 24,
+                      width: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Login com Google',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 3,
+                ),
+              ),
             ],
           ),
         ),

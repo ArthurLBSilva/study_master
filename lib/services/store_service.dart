@@ -61,4 +61,13 @@ class StoreService {
         .where('userId', isEqualTo: userId)
         .snapshots();
   }
+  Future<void> excluirItem(String idItem) async {
+  try {
+    await _firestore.collection('agenda').doc(idItem).delete();
+    print('Item excluído com sucesso!');
+  } catch (e) {
+    print('Erro ao excluir item: $e');
+    throw Exception('Erro ao excluir item');
+  }
+}
 }

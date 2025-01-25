@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         '/sign-up': (context) => SignUpScreen(), // Tela de Cadastro
         '/home': (context) => HomeScreen(),
         '/planejamento': (context) => PlanejamentoScreen(),
-        //  '/rotina_start': (context) => RotinaStartScreen(),
+        '/cadastro_planejamento': (context) => RotinaStartScreen(),
         //  '/rotina_end': (context) => RotinaEndScreen(),
       },
     );

@@ -35,15 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
     // Navega para telas com base no índice
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/planejamento');
+        Navigator.pushNamed(context, '/home'); // Tela inicial
         break;
       case 1:
-        // Adicione a navegação para a tela de flashcards
+        Navigator.pushNamed(context, '/planejamento');
         break;
       case 2:
-        // Adicione a navegação para a tela de Pomodoro
+        // Adicione a navegação para a tela de flashcards
         break;
       case 3:
+        // Adicione a navegação para a tela de Pomodoro
+        break;
+      case 4:
         // Adicione a navegação para a tela de Revisão
         break;
     }
@@ -83,6 +86,50 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     return lembretes;
+  }
+
+  // Função para excluir um item (lembrete ou compromisso)
+  Future<void> _excluirItem(String idItem) async {
+    try {
+      await _storeService.excluirItem(idItem);
+      print('Item excluído com sucesso!');
+    } catch (e) {
+      print('Erro ao excluir item: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao excluir item. Tente novamente.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // Diálogo de confirmação para exclusão
+  void _confirmarExclusao(String idItem) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Excluir item?'),
+          content: Text('Tem certeza que deseja excluir este item?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Fechar o diálogo
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                _excluirItem(idItem); // Excluir o item
+                Navigator.pop(context); // Fechar o diálogo
+              },
+              child: Text('Excluir', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -157,62 +204,75 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Aviso Diário
-                SizedBox(
-                  width: double.infinity, // Ocupa toda a largura disponível
-                  child: Card(
-                    color: const Color.fromARGB(255, 41, 103, 45),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 8), // Margem igual aos lembretes
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Aviso Diário',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          avisoDiario != null
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${avisoDiario['disciplina'] ?? 'Sem disciplina'}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      '${avisoDiario['compromisso'] ?? 'Sem compromisso'}',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Text(
-                                  'Nenhum diário para hoje!',
+                if (avisoDiario != null)
+                  SizedBox(
+                    width: double.infinity, // Ocupa toda a largura disponível
+                    child: Card(
+                      color: const Color.fromARGB(255, 41, 103, 45),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 8), // Margem igual aos lembretes
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Aviso Diário',
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
-                        ],
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.edit, color: Colors.white, size: 20),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/editarLembrete',
+                                          arguments: avisoDiario, // Passa o aviso diário como argumento
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                                      onPressed: () {
+                                        _confirmarExclusao(avisoDiario['id']);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '${avisoDiario['disciplina'] ?? 'Sem disciplina'}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '${avisoDiario['compromisso'] ?? 'Sem compromisso'}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
                 SizedBox(height: 20),
                 // Lembretes
                 Text(
@@ -243,12 +303,37 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                formatadorData.format(data), // Data formatada
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: const Color.fromARGB(255, 254, 255, 254),
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    formatadorData.format(data), // Data formatada
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: const Color.fromARGB(255, 254, 255, 254),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit, color: Colors.white, size: 20),
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/editarLembrete',
+                                            arguments: lembrete, // Passa o lembrete como argumento
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                                        onPressed: () {
+                                          _confirmarExclusao(lembrete['id']);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                               SizedBox(height: 8),
                               Text(
@@ -286,6 +371,10 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home), // Ícone de início
+            label: 'Início',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Planejamento',

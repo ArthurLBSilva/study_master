@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import '../services/store_service.dart';
+import '../services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -23,6 +27,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -30,12 +36,52 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0; // Índice do botão selecionado na BottomNavigationBar
+  final StoreService _storeService = StoreService(); 
+  final AuthService _authService = AuthService(); 
+
+  void buscarAgenda(String userId) async {
+  final agenda = await _storeService.getAgenda(userId);
+
+  if (agenda != null) {
+    // Acessando as variáveis retornadas do documento
+    final String titulo = agenda['titulo'] ?? 'Sem título'; // Exemplo de chave
+    final String descricao = agenda['descricao'] ?? 'Sem descrição';
+    final DateTime data = (agenda['data'] as Timestamp).toDate();    
+    // Agora você pode usar as variáveis como quiser
+    print('Título: $titulo');
+    print('Descrição: $descricao');
+    print('Data: $data');
+  } else {
+    print('Nenhuma agenda encontrada para o usuário.');
+  }
+}
+
+  String buscarUsuario() {
+  final idUsuario = _authService.getCurrentUser();
+  return idUsuario;
+  } 
+
 
   // Método para atualizar o índice selecionado
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    // Navega para telas com base no índice
+  switch (index) {
+    case 0:
+      Navigator.pushNamed(context, '/planejamento');
+      break;
+    case 1:
+      // Adicione a navegação para a tela de flashcards
+      break;
+    case 2:
+      // Adicione a navegação para a tela de Pomodoro
+      break;
+    case 3:
+      // Adicione a navegação para a tela de Revisão
+      break;
+  }
   }
 
   @override

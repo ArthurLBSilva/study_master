@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/login_screen.dart';
+import 'package:study_master/screens/planejamento_screen.dart';
 import 'package:study_master/screens/sign_up_screen.dart';
 import 'firebase_options.dart'; // Importando o arquivo gerado pelo Firebase CLI
 import 'package:firebase_auth/firebase_auth.dart'; // Importando para autenticação
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/sign-up': (context) => SignUpScreen(), // Tela de Cadastro
         '/home': (context) => HomeScreen(),
-        // '/house': (context) => HouseScreen(),
+        '/planejamento': (context) => PlanejamentoScreen(),
         //  '/rotina_start': (context) => RotinaStartScreen(),
         //  '/rotina_end': (context) => RotinaEndScreen(),
       },

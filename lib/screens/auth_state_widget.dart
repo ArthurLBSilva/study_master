@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:study_master/screens/sign_up_screen.dart';
+import 'package:study_master/screens/home_screen.dart';
 import 'login_screen.dart';
 
 class AuthStateWidget extends StatelessWidget {
@@ -11,7 +11,7 @@ class AuthStateWidget extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final user = snapshot.data;
-          return user == null ? LoginScreen() : SignUpScreen();
+          return user == null ? LoginScreen() : HomeScreen();
         }
         return Center(child: CircularProgressIndicator());
       },

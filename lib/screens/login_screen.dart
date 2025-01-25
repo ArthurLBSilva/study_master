@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/sign_up_screen.dart';
 import '../services/auth_service.dart';
 
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              SignUpScreen(), // Substitua pelo destino após login
+                              HomeScreen(), // Substitua pelo destino após login
                         ),
                       );
                     }

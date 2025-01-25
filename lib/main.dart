@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/login_screen.dart';
 import 'package:study_master/screens/sign_up_screen.dart';
 import 'firebase_options.dart'; // Importando o arquivo gerado pelo Firebase CLI
@@ -34,8 +35,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/sign-up': (context) => SignUpScreen(), // Tela de Cadastro
+        '/home': (context) => HomeScreen(),
         // '/house': (context) => HouseScreen(),
-        //  '/home': (context) => HomeScreen(),
         //  '/rotina_start': (context) => RotinaStartScreen(),
         //  '/rotina_end': (context) => RotinaEndScreen(),
       },

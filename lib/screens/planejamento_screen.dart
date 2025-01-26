@@ -371,7 +371,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
               Navigator.pushNamed(context, '/planejamento');
               break;
             case 2:
-              // Navegação para flashcards
+              Navigator.pushNamed(context, '/flashCard');
               break;
             case 3:
               // Navegação para Pomodoro

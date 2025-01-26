@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:study_master/services/auth_service.dart';
+import 'dart:async';
 
 class StoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
 
   // Função para salvar um compromisso/lembrete no Firestore
   Future<void> salvarAgenda({
@@ -99,7 +102,7 @@ class StoreService {
     }
   }
 
-   Future<void> editarAgenda({
+  Future<void> editarAgenda({
     required String id, // ID do documento a ser editado
     required String userId, // ID do usuário
     required DateTime data,
@@ -109,7 +112,8 @@ class StoreService {
   }) async {
     try {
       await _firestore
-          .collection('agenda') // Coleção onde os agendamentos estão armazenados
+          .collection(
+              'agenda') // Coleção onde os agendamentos estão armazenados
           .doc(id) // Documento específico a ser editado
           .update({
         'userId': userId,
@@ -123,4 +127,66 @@ class StoreService {
       throw Exception('Erro ao editar agendamento');
     }
   }
+
+  Future<void> salvarFlashcard({
+    required String userId,
+    required String disciplina,
+    required String pergunta,
+    required String resposta,
+  }) async {
+    try {
+      await _firestore.collection('flashcards').add({
+        'userId': userId,
+        'disciplina': disciplina,
+        'pergunta': pergunta,
+        'resposta': resposta,
+        'dataCriacao': Timestamp.now(), // Data atual
+      });
+    } catch (e) {
+      print('Erro ao salvar flashcard: $e');
+      throw Exception('Erro ao salvar flashcard');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getFlashcardsPorDisciplina(
+      String disciplina) async {
+    try {
+      final userId = _authService.getCurrentUser();
+      if (userId == null) {
+        throw Exception('Usuário não autenticado');
+      }
+
+      print('Buscando flashcards para a disciplina: $disciplina');
+
+      final querySnapshot = await _firestore
+          .collection('flashcards')
+          .where('userId', isEqualTo: userId)
+          .where('disciplina', isEqualTo: disciplina)
+          .get();
+
+      print('Flashcards encontrados: ${querySnapshot.docs.length}');
+
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        print('Flashcard: $data');
+        return {
+          'id': doc.id,
+          ...data,
+        };
+      }).toList();
+    } catch (e) {
+      print('Erro ao buscar flashcards: $e');
+      throw Exception('Erro ao buscar flashcards');
+    }
+  }
+
+  Future<void> deletarFlashcard(String flashcardId) async {
+  try {
+    await _firestore.collection('flashcards').doc(flashcardId).delete();
+    print('Flashcard deletado com sucesso');
+  } catch (e) {
+    print('Erro ao deletar flashcard: $e');
+    throw Exception('Erro ao deletar flashcard');
+  }
+}
 }

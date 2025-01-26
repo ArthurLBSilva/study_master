@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushNamed(context, '/planejamento');
         break;
       case 2:
-        // Adicione a navegação para a tela de flashcards
+        Navigator.pushNamed(context, '/flashCard');
         break;
       case 3:
         // Adicione a navegação para a tela de Pomodoro
@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final lembretes = getLembretesOrdenados(compromissos);
 
           return Container(
-            color: Color.fromARGB(255, 219, 220, 219),
+            color: Color.fromARGB(255, 255, 255, 255),
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

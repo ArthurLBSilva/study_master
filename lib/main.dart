@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:study_master/screens/cadastro_flashcard_screen.dart';
 import 'package:study_master/screens/cadastro_planejamento_screen.dart';
 import 'package:study_master/screens/editar_agenda_screen.dart';
+import 'package:study_master/screens/flashcard_screen.dart';
 import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/login_screen.dart';
 import 'package:study_master/screens/planejamento_screen.dart';
@@ -60,6 +62,9 @@ class MyApp extends StatelessWidget {
             lembrete: args['lembrete'], // Lembrete atual (pode ser nulo)
           );
         },
+        '/flashCard': (context) => FlashcardScreen(),
+        '/cadastro_flashcard': (context) => CadastroFlashcardScreen(),
+
       },
     );
   }

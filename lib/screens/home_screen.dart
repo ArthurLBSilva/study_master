@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:study_master/screens/editar_agenda_screen.dart';
 import '../services/store_service.dart';
 import '../services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Filtra os compromissos para o aviso diário (data igual à atual)
-  Map<String, dynamic>? getAvisoDiario(List<Map<String, dynamic>> compromissos) {
+  Map<String, dynamic>? getAvisoDiario(
+      List<Map<String, dynamic>> compromissos) {
     final hoje = DateTime.now();
     final formatador = DateFormat('yyyy-MM-dd'); // Formato da data
 
@@ -67,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Filtra e ordena os lembretes para datas iguais ou posteriores à atual
-  List<Map<String, dynamic>> getLembretesOrdenados(List<Map<String, dynamic>> compromissos) {
+  List<Map<String, dynamic>> getLembretesOrdenados(
+      List<Map<String, dynamic>> compromissos) {
     final hoje = DateTime.now();
     final formatador = DateFormat('yyyy-MM-dd'); // Formato da data
 
@@ -213,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: const EdgeInsets.symmetric(vertical: 8), // Margem igual aos lembretes
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8), // Margem igual aos lembretes
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -233,17 +237,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.edit, color: Colors.white, size: 20),
+                                      icon: Icon(Icons.edit,
+                                          color: Colors.white, size: 20),
                                       onPressed: () {
                                         Navigator.pushNamed(
                                           context,
-                                          '/editarLembrete',
-                                          arguments: avisoDiario, // Passa o aviso diário como argumento
+                                          '/editarAgenda',
+                                          arguments:
+                                              avisoDiario, // Passa o aviso diário como argumento
                                         );
                                       },
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                                      icon: Icon(Icons.delete,
+                                          color: Colors.white, size: 20),
                                       onPressed: () {
                                         _confirmarExclusao(avisoDiario['id']);
                                       },
@@ -289,7 +296,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView(
                     children: lembretes.map((lembrete) {
                       final data = (lembrete['data'] as Timestamp).toDate();
-                      final formatadorData = DateFormat('dd/MM'); // Formato da data
+                      final formatadorData =
+                          DateFormat('dd/MM'); // Formato da data
 
                       return Card(
                         color: const Color.fromARGB(255, 44, 119, 50),
@@ -297,36 +305,54 @@ class _HomeScreenState extends State<HomeScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        margin: const EdgeInsets.symmetric(vertical: 8), // Margem igual ao aviso diário
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8), // Margem igual ao aviso diário
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    formatadorData.format(data), // Data formatada
+                                    formatadorData
+                                        .format(data), // Data formatada
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: const Color.fromARGB(255, 254, 255, 254),
+                                      color: const Color.fromARGB(
+                                          255, 254, 255, 254),
                                     ),
                                   ),
                                   Row(
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.edit, color: Colors.white, size: 20),
+                                        icon: Icon(Icons.edit,
+                                            color: Colors.white, size: 20),
                                         onPressed: () {
-                                          Navigator.pushNamed(
+                                          Navigator.push(
                                             context,
-                                            '/editarLembrete',
-                                            arguments: lembrete, // Passa o lembrete como argumento
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditarAgendaScreen(
+                                                id: 'ID_DO_AGENDAMENTO',
+                                                data: DateTime
+                                                    .now(), // Data do agendamento
+                                                disciplina:
+                                                    'Matemática', // Disciplina atual
+                                                compromisso:
+                                                    'Estudar Cálculo', // Compromisso atual
+                                                lembrete:
+                                                    'Revisar Cálculo 1', // Lembrete atual
+                                              ),
+                                            ),
                                           );
                                         },
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.delete, color: Colors.white, size: 20),
+                                        icon: Icon(Icons.delete,
+                                            color: Colors.white, size: 20),
                                         onPressed: () {
                                           _confirmarExclusao(lembrete['id']);
                                         },
@@ -340,7 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 '${lembrete['disciplina'] ?? 'Sem disciplina'}',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: const Color.fromARGB(255, 254, 255, 254),
+                                  color:
+                                      const Color.fromARGB(255, 254, 255, 254),
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -348,7 +375,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 '${lembrete['lembrete'] ?? 'Sem lembrete'}',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: const Color.fromARGB(255, 255, 255, 255),
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
                                 ),
                               ),
                             ],

@@ -3,18 +3,26 @@ import '../services/store_service.dart'; // Importe o StoreService
 import '../services/auth_service.dart'; // Importe o AuthService
 import 'package:intl/intl.dart'; // Para usar DateFormat
 
-class CadastroPlanejamentoScreen extends StatefulWidget {
-  final DateTime selectedDate; // Data selecionada no calendário
+class EditarAgendaScreen extends StatefulWidget {
+  final String id; // ID do agendamento a ser editado
+  final DateTime data; // Data do agendamento
+  final String disciplina; // Disciplina atual
+  final String? compromisso; // Compromisso atual
+  final String? lembrete; // Lembrete atual
 
-  CadastroPlanejamentoScreen({required this.selectedDate});
+  EditarAgendaScreen({
+    required this.id,
+    required this.data,
+    required this.disciplina,
+    this.compromisso,
+    this.lembrete,
+  });
 
   @override
-  _CadastroPlanejamentoScreenState createState() =>
-      _CadastroPlanejamentoScreenState();
+  _EditarAgendaScreenState createState() => _EditarAgendaScreenState();
 }
 
-class _CadastroPlanejamentoScreenState
-    extends State<CadastroPlanejamentoScreen> {
+class _EditarAgendaScreenState extends State<EditarAgendaScreen> {
   final TextEditingController _disciplinaController = TextEditingController();
   final TextEditingController _compromissoController = TextEditingController();
   final TextEditingController _lembreteController = TextEditingController();
@@ -22,8 +30,17 @@ class _CadastroPlanejamentoScreenState
   final StoreService _storeService = StoreService(); // Instância do StoreService
   final AuthService _authService = AuthService(); // Instância do AuthService
 
-  // Função para salvar os dados
-  void _salvarPlanejamento() async {
+  @override
+  void initState() {
+    super.initState();
+    // Preenche os campos com os valores atuais
+    _disciplinaController.text = widget.disciplina;
+    _compromissoController.text = widget.compromisso ?? '';
+    _lembreteController.text = widget.lembrete ?? '';
+  }
+
+  // Função para salvar as alterações
+  void _editarAgendamento() async {
     final disciplina = _disciplinaController.text.trim();
     final compromisso = _compromissoController.text.trim();
     final lembrete = _lembreteController.text.trim();
@@ -55,11 +72,12 @@ class _CadastroPlanejamentoScreenState
       return;
     }
 
-    // Salva os dados no Firestore
+    // Salva as alterações no Firestore
     try {
-      await _storeService.salvarAgenda(
+      await _storeService.editarAgenda(
+        id: widget.id, // ID do agendamento a ser editado
         userId: userId,
-        data: widget.selectedDate,
+        data: widget.data,
         disciplina: disciplina,
         compromisso: compromisso.isNotEmpty ? compromisso : null,
         lembrete: lembrete.isNotEmpty ? lembrete : null,
@@ -70,54 +88,13 @@ class _CadastroPlanejamentoScreenState
 
       // Exibe uma mensagem de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Compromisso salvo com sucesso!')),
+        SnackBar(content: Text('Agendamento editado com sucesso!')),
       );
     } catch (e) {
-      // Exibe uma mensagem de erro se o salvamento falhar
+      // Exibe uma mensagem de erro se a edição falhar
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao salvar compromisso: $e')),
+        SnackBar(content: Text('Erro ao editar agendamento: $e')),
       );
-    }
-  }
-
-  // Função para abrir a lista de disciplinas
-  Future<void> _abrirListaDisciplinas() async {
-    // Busca a lista de disciplinas do Firestore
-    final disciplinas = await _storeService.getDisciplinas();
-
-    // Ordena a lista em ordem alfabética
-    disciplinas.sort();
-
-    // Exibe a lista em um modal
-    final disciplinaSelecionada = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Selecione uma disciplina'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: disciplinas.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(disciplinas[index]),
-                  onTap: () {
-                    Navigator.pop(context, disciplinas[index]); // Retorna a disciplina selecionada
-                  },
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-
-    // Preenche o campo de disciplina com o valor selecionado
-    if (disciplinaSelecionada != null) {
-      setState(() {
-        _disciplinaController.text = disciplinaSelecionada;
-      });
     }
   }
 
@@ -126,7 +103,7 @@ class _CadastroPlanejamentoScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Adicionar à Agenda',
+          'Editar Agenda',
           style: TextStyle(
             color: Colors.white, // Cor do texto em branco
           ),
@@ -140,7 +117,7 @@ class _CadastroPlanejamentoScreenState
           children: [
             // Data selecionada
             Text(
-              DateFormat('dd/MM').format(widget.selectedDate),
+              DateFormat('dd/MM').format(widget.data),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -155,13 +132,7 @@ class _CadastroPlanejamentoScreenState
                 labelText: 'Disciplina*',
                 hintText: 'Ex: Matemática',
                 border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.arrow_drop_down),
-                  onPressed: _abrirListaDisciplinas, // Abre a lista de disciplinas
-                ),
               ),
-              readOnly: true, // Impede que o usuário digite manualmente
-              onTap: _abrirListaDisciplinas, // Abre a lista ao clicar no campo
             ),
             SizedBox(height: 16),
             // Campo de Compromisso Diário
@@ -208,7 +179,7 @@ class _CadastroPlanejamentoScreenState
                 SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _salvarPlanejamento,
+                    onPressed: _editarAgendamento,
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           const Color(0xFF2E8B57), // Cor do botão Salvar

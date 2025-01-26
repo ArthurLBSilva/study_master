@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:study_master/screens/cadastro_planejamento_screen.dart';
+import 'package:study_master/screens/editar_agenda_screen.dart';
 import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/login_screen.dart';
 import 'package:study_master/screens/planejamento_screen.dart';
@@ -38,8 +40,26 @@ class MyApp extends StatelessWidget {
         '/sign-up': (context) => SignUpScreen(), // Tela de Cadastro
         '/home': (context) => HomeScreen(),
         '/planejamento': (context) => PlanejamentoScreen(),
-        '/cadastro_planejamento': (context) => RotinaStartScreen(),
-        //  '/rotina_end': (context) => RotinaEndScreen(),
+        '/cadastro_planejamento': (context) {
+          // Extrai o argumento passado ao navegar
+          final DateTime selectedDate =
+              ModalRoute.of(context)!.settings.arguments as DateTime;
+          return CadastroPlanejamentoScreen(selectedDate: selectedDate);
+        },
+        '/editarAgenda': (context) {
+          // Extrai os argumentos passados ao navegar
+          final Map<String, dynamic> args = ModalRoute.of(context)!
+              .settings
+              .arguments as Map<String, dynamic>;
+          return EditarAgendaScreen(
+            id: args['id'], // ID do agendamento
+            data: args['data'], // Data do agendamento
+            disciplina: args['disciplina'], // Disciplina atual
+            compromisso:
+                args['compromisso'], // Compromisso atual (pode ser nulo)
+            lembrete: args['lembrete'], // Lembrete atual (pode ser nulo)
+          );
+        },
       },
     );
   }

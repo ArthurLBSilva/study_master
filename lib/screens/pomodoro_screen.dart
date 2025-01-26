@@ -251,7 +251,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
       ),
       // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Índice da tela atual (Pomodoro)
+        currentIndex: 3, // Índice da tela atual (Pomodoro)
         onTap: (index) {
           switch (index) {
             case 0:
@@ -261,13 +261,13 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               Navigator.pushNamed(context, '/planejamento');
               break;
             case 2:
-              Navigator.pushNamed(context, '/flashcards');
+              Navigator.pushNamed(context, '/flashCard');
               break;
             case 3:
               // Já está na tela de Pomodoro
               break;
             case 4:
-              Navigator.pushNamed(context, '/revisao');
+              Navigator.pushNamed(context, '/estatistica');
               break;
           }
         },
@@ -282,7 +282,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Planejamento',
+            label: 'Agenda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.credit_card),
@@ -293,8 +293,8 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
             label: 'Pomodoro',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.refresh),
-            label: 'Revisão',
+            icon: Icon(Icons.insights),
+            label: 'Estatística',
           ),
         ],
       ),

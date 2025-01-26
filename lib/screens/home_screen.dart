@@ -36,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // Navega para telas com base no índice
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/home'); // Tela inicial
         break;
       case 1:
         Navigator.pushNamed(context, '/planejamento');
@@ -48,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushNamed(context, '/pomodoro');
         break;
       case 4:
-        // Adicione a navegação para a tela de Revisão
+        Navigator.pushNamed(context, '/estatistica');
         break;
     }
   }
@@ -418,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Planejamento',
+            label: 'Agenda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.credit_card),
@@ -429,8 +428,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Pomodoro',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.refresh),
-            label: 'Revisão',
+            icon: Icon(Icons.insights),
+            label: 'Estatística',
           ),
         ],
       ),

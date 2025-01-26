@@ -179,7 +179,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
         Navigator.pushNamed(context, '/pomodoro');
         break;
       case 4:
-        Navigator.pushNamed(context, '/revisao');
+        Navigator.pushNamed(context, '/estatistica');
         break;
     }
   }
@@ -370,7 +370,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Planejamento',
+            label: 'Agenda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.credit_card),
@@ -381,8 +381,8 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             label: 'Pomodoro',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.refresh),
-            label: 'Revisão',
+            icon: Icon(Icons.insights),
+            label: 'Estatística',
           ),
         ],
       ),

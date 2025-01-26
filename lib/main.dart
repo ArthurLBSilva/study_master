@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:study_master/screens/cadastro_flashcard_screen.dart';
 import 'package:study_master/screens/cadastro_planejamento_screen.dart';
+import 'package:study_master/screens/cadastro_pomodoro_screen.dart';
 import 'package:study_master/screens/editar_agenda_screen.dart';
 import 'package:study_master/screens/flashcard_screen.dart';
 import 'package:study_master/screens/home_screen.dart';
 import 'package:study_master/screens/login_screen.dart';
 import 'package:study_master/screens/planejamento_screen.dart';
+import 'package:study_master/screens/pomodoro_screen.dart';
 import 'package:study_master/screens/sign_up_screen.dart';
 import 'firebase_options.dart'; // Importando o arquivo gerado pelo Firebase CLI
 import 'package:firebase_auth/firebase_auth.dart'; // Importando para autenticação
@@ -64,6 +66,9 @@ class MyApp extends StatelessWidget {
         },
         '/flashCard': (context) => FlashcardScreen(),
         '/cadastro_flashcard': (context) => CadastroFlashcardScreen(),
+        '/pomodoro': (context) => PomodoroScreen(),
+        '/cadastro_pomodoro': (context) => CadastroPomodoroScreen(),
+
 
       },
     );

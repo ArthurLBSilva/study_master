@@ -181,12 +181,88 @@ class StoreService {
   }
 
   Future<void> deletarFlashcard(String flashcardId) async {
-  try {
-    await _firestore.collection('flashcards').doc(flashcardId).delete();
-    print('Flashcard deletado com sucesso');
-  } catch (e) {
-    print('Erro ao deletar flashcard: $e');
-    throw Exception('Erro ao deletar flashcard');
+    try {
+      await _firestore.collection('flashcards').doc(flashcardId).delete();
+      print('Flashcard deletado com sucesso');
+    } catch (e) {
+      print('Erro ao deletar flashcard: $e');
+      throw Exception('Erro ao deletar flashcard');
+    }
   }
-}
+
+  Future<String> salvarPomodoroInicial({
+    required String disciplina,
+    required int tempoEstudo,
+    required int tempoDescanso,
+    required String userId,
+  }) async {
+    try {
+      final docRef = await _firestore.collection('pomodoro').add({
+        'disciplina': disciplina,
+        'tempoEstudo': tempoEstudo,
+        'tempoDescanso': tempoDescanso,
+        'userId': userId,
+        'tempoEstudado': 0, // Inicializa com 0
+        'dataSessao': DateTime.now().toIso8601String(), // Data atual
+      });
+      return docRef.id; // Retorna o ID do documento criado
+    } catch (e) {
+      print('Erro ao salvar Pomodoro inicial: $e');
+      throw Exception('Erro ao salvar Pomodoro inicial');
+    }
+  }
+
+  Future<void> atualizarPomodoroFinal({
+    required String pomodoroId,
+    required double tempoEstudado, // Alterado para double
+  }) async {
+    try {
+      await _firestore.collection('pomodoro').doc(pomodoroId).update({
+        'tempoEstudado': tempoEstudado, // Salva como double
+      });
+    } catch (e) {
+      print('Erro ao atualizar Pomodoro: $e');
+      throw Exception('Erro ao atualizar Pomodoro');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getPomodorosPorDisciplina({
+    required String disciplina,
+    required String userId,
+  }) async {
+    try {
+      // Verifica se a disciplina e o userId são válidos
+      if (disciplina.isEmpty || userId.isEmpty) {
+        throw Exception('Disciplina ou userId inválidos');
+      }
+
+      // Realiza a consulta no Firestore (sem filtrar tempoEstudado)
+      final querySnapshot = await _firestore
+          .collection('pomodoro')
+          .where('disciplina', isEqualTo: disciplina)
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      // Filtra os documentos localmente (tempoEstudado > 0)
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>? ?? {}; // Evita null
+        return {
+          'id': doc.id,
+          ...data,
+        };
+      }).where((data) {
+        // Converte tempoEstudado para double, independentemente de ser int ou double
+        final tempoEstudado = data['tempoEstudado'];
+        if (tempoEstudado is int) {
+          return tempoEstudado > 0;
+        } else if (tempoEstudado is double) {
+          return tempoEstudado > 0;
+        }
+        return false; // Ignora valores inválidos
+      }).toList();
+    } catch (e) {
+      print('Erro ao buscar Pomodoros: $e');
+      throw Exception('Erro ao buscar Pomodoros: $e');
+    }
+  }
 }

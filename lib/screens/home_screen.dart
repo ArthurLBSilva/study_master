@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pushNamed(context, '/flashCard');
         break;
       case 3:
-        // Adicione a navegação para a tela de Pomodoro
+        Navigator.pushNamed(context, '/pomodoro');
         break;
       case 4:
         // Adicione a navegação para a tela de Revisão

@@ -105,6 +105,60 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     );
   }
 
+  // Função para exibir o modal com a pergunta e a resposta
+  void _mostrarModalFlashcard(Map<String, dynamic> flashcard) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Pergunta',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                flashcard['pergunta'],
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Resposta',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                flashcard['resposta'],
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Fecha o modal
+              },
+              child: Text('Fechar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Função para navegar entre as telas
   void _onItemTapped(int index) {
     setState(() {
@@ -209,83 +263,79 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                             final flashcard = _flashcards[index];
                             return Card(
                               margin: EdgeInsets.only(bottom: 16),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            flashcard['pergunta'],
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                              child: InkWell(
+                                onTap: () {
+                                  _mostrarModalFlashcard(flashcard); // Exibe o modal com a pergunta e resposta
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              flashcard['pergunta'],
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.delete, color: Colors.green),
-                                          onPressed: () async {
-                                            // Exibe o modal de confirmação
-                                            final confirmar = await showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                title: Text('Confirmar exclusão'),
-                                                content: Text(
-                                                    'Tem certeza que deseja excluir este flashcard?'),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context, false),
-                                                    child: Text('Cancelar'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context, true),
-                                                    child: Text('Excluir',
-                                                        style: TextStyle(color: Colors.red)),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                          IconButton(
+                                            icon: Icon(Icons.delete, color: Colors.green),
+                                            onPressed: () async {
+                                              // Exibe o modal de confirmação
+                                              final confirmar = await showDialog(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  title: Text('Confirmar exclusão'),
+                                                  content: Text(
+                                                      'Tem certeza que deseja excluir este flashcard?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(context, false),
+                                                      child: Text('Cancelar'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(context, true),
+                                                      child: Text('Excluir',
+                                                          style: TextStyle(color: Colors.red)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
 
-                                            // Se o usuário confirmar, exclui o flashcard
-                                            if (confirmar == true) {
-                                              try {
-                                                await _storeService.deletarFlashcard(
-                                                    flashcard['id']);
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                      content: Text(
-                                                          'Flashcard excluído com sucesso!')),
-                                                );
-                                                // Recarrega a lista de flashcards
-                                                _carregarFlashcards();
-                                              } catch (e) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                      content: Text(
-                                                          'Erro ao excluir flashcard: $e')),
-                                                );
+                                              // Se o usuário confirmar, exclui o flashcard
+                                              if (confirmar == true) {
+                                                try {
+                                                  await _storeService.deletarFlashcard(
+                                                      flashcard['id']);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            'Flashcard excluído com sucesso!')),
+                                                  );
+                                                  // Recarrega a lista de flashcards
+                                                  _carregarFlashcards();
+                                                } catch (e) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            'Erro ao excluir flashcard: $e')),
+                                                  );
+                                                }
                                               }
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    Divider(color: Colors.grey),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      flashcard['resposta'],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.green,
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

@@ -73,6 +73,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
     // Verifica se há agendamentos
     if (querySnapshot.docs.isNotEmpty) {
       final agendamento = querySnapshot.docs.first.data();
+      final idAgendamento = querySnapshot.docs.first.id; // ID do agendamento
 
       showModalBottomSheet(
         context: context,
@@ -154,12 +155,14 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => EditarAgendaScreen(
-                              id: 'ID_DO_AGENDAMENTO',
-                              data: DateTime.now(), // Data do agendamento
-                              disciplina: 'Matemática', // Disciplina atual
-                              compromisso:
-                                  'Estudar Cálculo', // Compromisso atual
-                              lembrete: 'Revisar Cálculo 1', // Lembrete atual
+                              id: idAgendamento, // ID do agendamento
+                              data: (agendamento['data'] as Timestamp)
+                                  .toDate(), // Data do agendamento
+                              disciplina: agendamento[
+                                  'disciplina'], // Disciplina atual
+                              compromisso: agendamento[
+                                  'compromisso'], // Compromisso atual
+                              lembrete: agendamento['lembrete'], // Lembrete atual
                             ),
                           ),
                         );

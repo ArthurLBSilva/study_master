@@ -240,11 +240,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                       icon: Icon(Icons.edit,
                                           color: Colors.white, size: 20),
                                       onPressed: () {
-                                        Navigator.pushNamed(
+                                        Navigator.push(
                                           context,
-                                          '/editarAgenda',
-                                          arguments:
-                                              avisoDiario, // Passa o aviso diário como argumento
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditarAgendaScreen(
+                                              id: avisoDiario['id'],
+                                              data: (avisoDiario['data']
+                                                      as Timestamp)
+                                                  .toDate(),
+                                              disciplina: avisoDiario[
+                                                  'disciplina'], // Disciplina atual
+                                              compromisso: avisoDiario[
+                                                  'compromisso'], // Compromisso atual
+                                              lembrete: avisoDiario[
+                                                  'lembrete'], // Lembrete atual
+                                            ),
+                                          ),
                                         );
                                       },
                                     ),
@@ -336,15 +348,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   EditarAgendaScreen(
-                                                id: 'ID_DO_AGENDAMENTO',
-                                                data: DateTime
-                                                    .now(), // Data do agendamento
-                                                disciplina:
-                                                    'Matemática', // Disciplina atual
-                                                compromisso:
-                                                    'Estudar Cálculo', // Compromisso atual
-                                                lembrete:
-                                                    'Revisar Cálculo 1', // Lembrete atual
+                                                id: lembrete['id'],
+                                                data: (lembrete['data']
+                                                        as Timestamp)
+                                                    .toDate(),
+                                                disciplina: lembrete[
+                                                    'disciplina'], // Disciplina atual
+                                                compromisso: lembrete[
+                                                    'compromisso'], // Compromisso atual
+                                                lembrete: lembrete[
+                                                    'lembrete'], // Lembrete atual
                                               ),
                                             ),
                                           );

@@ -22,6 +22,72 @@ class _CadastroPlanejamentoScreenState
   final StoreService _storeService = StoreService(); // Instância do StoreService
   final AuthService _authService = AuthService(); // Instância do AuthService
 
+  List<String> _disciplinas = []; // Lista de disciplinas
+
+  @override
+  void initState() {
+    super.initState();
+    // Carrega a lista de disciplinas ao iniciar a tela
+    _carregarDisciplinas();
+  }
+
+  // Função para carregar a lista de disciplinas
+  Future<void> _carregarDisciplinas() async {
+    try {
+      final disciplinas = await _storeService.getDisciplinas();
+      setState(() {
+        _disciplinas = disciplinas;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar disciplinas: $e')),
+      );
+    }
+  }
+
+  // Função para exibir a lista de disciplinas em um modal
+  void _mostrarListaDisciplinas() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Selecione uma disciplina',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _disciplinas.length,
+                  itemBuilder: (context, index) {
+                    final disciplina = _disciplinas[index];
+                    return ListTile(
+                      title: Text(disciplina),
+                      onTap: () {
+                        setState(() {
+                          _disciplinaController.text = disciplina;
+                        });
+                        Navigator.pop(context); // Fecha o modal
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // Função para salvar os dados
   void _salvarPlanejamento() async {
     final disciplina = _disciplinaController.text.trim();
@@ -80,47 +146,6 @@ class _CadastroPlanejamentoScreenState
     }
   }
 
-  // Função para abrir a lista de disciplinas
-  Future<void> _abrirListaDisciplinas() async {
-    // Busca a lista de disciplinas do Firestore
-    final disciplinas = await _storeService.getDisciplinas();
-
-    // Ordena a lista em ordem alfabética
-    disciplinas.sort();
-
-    // Exibe a lista em um modal
-    final disciplinaSelecionada = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Selecione uma disciplina'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: disciplinas.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(disciplinas[index]),
-                  onTap: () {
-                    Navigator.pop(context, disciplinas[index]); // Retorna a disciplina selecionada
-                  },
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-
-    // Preenche o campo de disciplina com o valor selecionado
-    if (disciplinaSelecionada != null) {
-      setState(() {
-        _disciplinaController.text = disciplinaSelecionada;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,19 +174,31 @@ class _CadastroPlanejamentoScreenState
             ),
             SizedBox(height: 20),
             // Campo de Disciplina
-            TextField(
-              controller: _disciplinaController,
-              decoration: InputDecoration(
-                labelText: 'Disciplina*',
-                hintText: 'Ex: Matemática',
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.arrow_drop_down),
-                  onPressed: _abrirListaDisciplinas, // Abre a lista de disciplinas
+            InkWell(
+              onTap: _mostrarListaDisciplinas, // Abre o modal de disciplinas
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Disciplina*',
+                  border: OutlineInputBorder(),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _disciplinaController.text.isEmpty
+                          ? 'Selecione uma disciplina'
+                          : _disciplinaController.text,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _disciplinaController.text.isEmpty
+                            ? Colors.grey
+                            : Colors.black,
+                      ),
+                    ),
+                    Icon(Icons.arrow_drop_down),
+                  ],
                 ),
               ),
-              readOnly: true, // Impede que o usuário digite manualmente
-              onTap: _abrirListaDisciplinas, // Abre a lista ao clicar no campo
             ),
             SizedBox(height: 16),
             // Campo de Compromisso Diário

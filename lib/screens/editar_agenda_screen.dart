@@ -23,30 +23,92 @@ class EditarAgendaScreen extends StatefulWidget {
 }
 
 class _EditarAgendaScreenState extends State<EditarAgendaScreen> {
-  final TextEditingController _disciplinaController = TextEditingController();
   final TextEditingController _compromissoController = TextEditingController();
   final TextEditingController _lembreteController = TextEditingController();
 
   final StoreService _storeService = StoreService(); // Instância do StoreService
   final AuthService _authService = AuthService(); // Instância do AuthService
 
+  List<String> _disciplinas = []; // Lista de disciplinas
+  String? _disciplinaSelecionada; // Disciplina selecionada
+
   @override
   void initState() {
     super.initState();
     // Preenche os campos com os valores atuais
-    _disciplinaController.text = widget.disciplina;
+    _disciplinaSelecionada = widget.disciplina;
     _compromissoController.text = widget.compromisso ?? '';
     _lembreteController.text = widget.lembrete ?? '';
+
+    // Carrega a lista de disciplinas
+    _carregarDisciplinas();
+  }
+
+  // Função para carregar a lista de disciplinas
+  Future<void> _carregarDisciplinas() async {
+    try {
+      final disciplinas = await _storeService.getDisciplinas();
+      setState(() {
+        _disciplinas = disciplinas;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar disciplinas: $e')),
+      );
+    }
+  }
+
+  // Função para exibir a lista de disciplinas em um modal
+  void _mostrarListaDisciplinas() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Selecione uma disciplina',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _disciplinas.length,
+                  itemBuilder: (context, index) {
+                    final disciplina = _disciplinas[index];
+                    return ListTile(
+                      title: Text(disciplina),
+                      onTap: () {
+                        setState(() {
+                          _disciplinaSelecionada = disciplina;
+                        });
+                        Navigator.pop(context); // Fecha o modal
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // Função para salvar as alterações
   void _editarAgendamento() async {
-    final disciplina = _disciplinaController.text.trim();
+    final disciplina = _disciplinaSelecionada;
     final compromisso = _compromissoController.text.trim();
     final lembrete = _lembreteController.text.trim();
 
     // Validação 1: Disciplina é obrigatória
-    if (disciplina.isEmpty) {
+    if (disciplina == null || disciplina.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('O campo Disciplina é obrigatório.')),
       );
@@ -126,12 +188,28 @@ class _EditarAgendaScreenState extends State<EditarAgendaScreen> {
             ),
             SizedBox(height: 20),
             // Campo de Disciplina
-            TextField(
-              controller: _disciplinaController,
-              decoration: InputDecoration(
-                labelText: 'Disciplina*',
-                hintText: 'Ex: Matemática',
-                border: OutlineInputBorder(),
+            InkWell(
+              onTap: _mostrarListaDisciplinas, // Abre o modal de disciplinas
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Disciplina*',
+                  border: OutlineInputBorder(),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _disciplinaSelecionada ?? 'Selecione uma disciplina',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _disciplinaSelecionada == null
+                            ? Colors.grey
+                            : Colors.black,
+                      ),
+                    ),
+                    Icon(Icons.arrow_drop_down),
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 16),

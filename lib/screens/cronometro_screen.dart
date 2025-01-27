@@ -24,9 +24,17 @@ class _CronometroScreenState extends State<CronometroScreen> {
   bool _emEstudo = true; // Indica se está no ciclo de estudo ou descanso
   bool _pausado = true; // Indica se o cronômetro está pausado
   double _tempoEstudadoTotal = 0; // Em minutos (com valor quebrado)
-  bool _mostrarBotaoSalvar = false; // Controla a visibilidade do botão de salvar
-  bool _tempoIniciado = false; // Indica se o cronômetro foi iniciado pelo menos uma vez
+  bool _mostrarBotaoSalvar =
+      false; // Controla a visibilidade do botão de salvar
+  bool _tempoIniciado =
+      false; // Indica se o cronômetro foi iniciado pelo menos uma vez
   Timer? _timer; // Timer para controlar a contagem regressiva
+
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde
+  final Color _appBarColor = Color(0xFF0C5149); // Cor da AppBar
+  final Color _textColor = Colors.white; // Cor do texto
 
   @override
   void initState() {
@@ -40,7 +48,8 @@ class _CronometroScreenState extends State<CronometroScreen> {
         setState(() {
           _tempoRestante--;
           if (_emEstudo) {
-            _tempoEstudadoTotal += 1 / 60; // Adiciona 1 segundo ao tempo estudado
+            _tempoEstudadoTotal +=
+                1 / 60; // Adiciona 1 segundo ao tempo estudado
           }
         });
       } else if (_tempoRestante == 0) {
@@ -54,14 +63,16 @@ class _CronometroScreenState extends State<CronometroScreen> {
       if (_emEstudo) {
         // Terminou o tempo de estudo, inicia o descanso
         _emEstudo = false;
-        _tempoRestante = widget.tempoDescanso * 60; // Converte minutos para segundos
+        _tempoRestante =
+            widget.tempoDescanso * 60; // Converte minutos para segundos
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Hora do descanso!')),
         );
       } else {
         // Terminou o tempo de descanso, volta ao estudo
         _emEstudo = true;
-        _tempoRestante = widget.tempoEstudo * 60; // Converte minutos para segundos
+        _tempoRestante =
+            widget.tempoEstudo * 60; // Converte minutos para segundos
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Volte aos estudos!')),
         );
@@ -87,7 +98,8 @@ class _CronometroScreenState extends State<CronometroScreen> {
       final storeService = StoreService();
       await storeService.atualizarPomodoroFinal(
         pomodoroId: widget.pomodoroId,
-        tempoEstudado: _tempoEstudadoTotal, // Salva em minutos (com valor quebrado)
+        tempoEstudado:
+            _tempoEstudadoTotal, // Salva em minutos (com valor quebrado)
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +127,8 @@ class _CronometroScreenState extends State<CronometroScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Certeza que quer sair?'),
-          content: Text('Você vai perder seu progresso. Clique em Salvar antes.'),
+          content:
+              Text('Você vai perder seu progresso. Clique em Salvar antes.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -147,63 +160,84 @@ class _CronometroScreenState extends State<CronometroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Text(
+          'Cronômetro',
+          style: TextStyle(
+            color: _textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: _appBarColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: _textColor),
+          onPressed:
+              _confirmarSaida, // Chama a função de confirmação ao clicar na seta
+        ),
+      ),
+      body: Container(
+        color: _backgroundColor,
+        width:
+            MediaQuery.of(context).size.width, // Ocupa toda a largura da tela
+        height:
+            MediaQuery.of(context).size.height, // Ocupa toda a altura da tela
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Centraliza horizontalmente
           children: [
-            Text(
-              'StudyMaster',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // Nome da disciplina
             Text(
               widget.disciplina,
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _textColor,
               ),
             ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF2E8B57),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: _confirmarSaida, // Chama a função de confirmação ao clicar na seta
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+            SizedBox(height: 20),
             // Cronômetro
             Container(
               width: 200,
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _emEstudo ? Colors.green : Colors.blue,
+                border: Border.all(
+                  color: _emEstudo ? _primaryColor : Colors.blue,
+                  width: 4, // Borda mais fina
+                ),
               ),
               child: Center(
                 child: Text(
                   _formatarTempo(_tempoRestante),
                   style: TextStyle(
                     fontSize: 32,
-                    color: Colors.white,
+                    color: _textColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
             SizedBox(height: 20),
-            // Botão de Iniciar/Pausar (ícone)
-            IconButton(
+            // Botão de Iniciar/Pausar
+            ElevatedButton(
               onPressed: _iniciarOuPausar,
-              iconSize: 64,
-              icon: Icon(
-                _pausado ? Icons.play_circle_filled : Icons.pause_circle_filled,
-                color: _pausado ? Colors.green : Colors.red,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _pausado
+                    ? _primaryColor
+                    : const Color.fromARGB(255, 169, 62, 62), // Vermelho mais claro
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                _pausado ? 'Iniciar' : 'Pausar',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: _textColor,
+                ),
               ),
             ),
             SizedBox(height: 20),
@@ -212,14 +246,17 @@ class _CronometroScreenState extends State<CronometroScreen> {
               ElevatedButton(
                 onPressed: _salvarTempoEstudado,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2E8B57),
+                  backgroundColor: _primaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
                 child: Text(
                   'Salvar',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white,
+                    color: _textColor,
                   ),
                 ),
               ),

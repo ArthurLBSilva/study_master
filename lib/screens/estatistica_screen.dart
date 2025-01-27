@@ -42,21 +42,26 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
         dataInicio = dataFim;
     }
 
+    // Consulta simples: filtra apenas por userId
     final querySnapshot = await FirebaseFirestore.instance
         .collection('pomodoro')
         .where('userId', isEqualTo: userId)
-        .where('dataSessao', isGreaterThanOrEqualTo: dataInicio.toIso8601String())
-        .where('dataSessao', isLessThanOrEqualTo: dataFim.toIso8601String())
         .get();
 
+    // Filtra os dados localmente por data
     _tempoPorDisciplina.clear();
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final disciplina = data['disciplina'] as String;
-      final tempoEstudado = data['tempoEstudado'] as double;
+      final tempoEstudado =
+          (data['tempoEstudado'] as num).toDouble(); // Corrigido aqui
+      final dataSessao = DateTime.parse(data['dataSessao'] as String);
 
-      _tempoPorDisciplina[disciplina] =
-          (_tempoPorDisciplina[disciplina] ?? 0) + tempoEstudado;
+      // Verifica se a data está dentro do intervalo selecionado
+      if (dataSessao.isAfter(dataInicio) && dataSessao.isBefore(dataFim)) {
+        _tempoPorDisciplina[disciplina] =
+            (_tempoPorDisciplina[disciplina] ?? 0) + tempoEstudado;
+      }
     }
 
     setState(() {});
@@ -72,6 +77,10 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
   Widget build(BuildContext context) {
     // Verifica se todos os valores são zero
     bool todosZeros = _tempoPorDisciplina.values.every((valor) => valor == 0);
+
+    // Ordena as disciplinas por tempo estudado (do maior para o menor)
+    final disciplinasOrdenadas = _tempoPorDisciplina.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     // Gera os dados para o gráfico de pizza
     List<PieChartSectionData> sections = [];
@@ -92,27 +101,32 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
       );
     } else {
       // Calcula o total do tempo estudado
-      double total = _tempoPorDisciplina.values.fold(0, (sum, valor) => sum + valor);
+      double total =
+          _tempoPorDisciplina.values.fold(0, (sum, valor) => sum + valor);
 
       // Gera as seções para cada disciplina
-      sections = _tempoPorDisciplina.entries.map((entry) {
+      for (int i = 0; i < disciplinasOrdenadas.length; i++) {
+        final entry = disciplinasOrdenadas[i];
         final double porcentagem = (entry.value / total) * 100;
-        return PieChartSectionData(
-          color: _getCorDisciplina(entry.key),
-          value: porcentagem,
-          title: '${porcentagem.toStringAsFixed(1)}%',
-          radius: 60,
-          titleStyle: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        sections.add(
+          PieChartSectionData(
+            color: _getCorPorPosicao(i), // Define a cor com base na posição
+            value: porcentagem,
+            title: '${porcentagem.toStringAsFixed(1)}%',
+            radius: 60,
+            titleStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         );
-      }).toList();
+      }
     }
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           'StudyMaster',
           style: TextStyle(
@@ -128,6 +142,8 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Espaçamento maior entre a navbar e os botões de filtro
+            SizedBox(height: 20),
             // Filtros (Dia, Semana, Mês)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -167,16 +183,29 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
               ),
             ),
             SizedBox(height: 20),
+            // Mensagem quando não há estudos
+            if (todosZeros)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Nenhum estudo realizado ainda',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
             // Legenda (apenas se houver dados)
             if (!todosZeros)
               Expanded(
                 child: ListView(
-                  children: _tempoPorDisciplina.entries.map((entry) {
+                  children: disciplinasOrdenadas.map((entry) {
                     return ListTile(
                       leading: Container(
                         width: 16,
                         height: 16,
-                        color: _getCorDisciplina(entry.key),
+                        color: _getCorPorPosicao(
+                            disciplinasOrdenadas.indexOf(entry)),
                       ),
                       title: Text(entry.key),
                       trailing: Text(_formatarTempo(entry.value)),
@@ -187,20 +216,73 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
           ],
         ),
       ),
+      // Bottom Navigation Bar
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 4, // Índice da tela de estatísticas
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushNamed(context, '/home');
+              break;
+            case 1:
+              Navigator.pushNamed(context, '/agenda');
+              break;
+            case 2:
+              Navigator.pushNamed(context, '/flashCard');
+              break;
+            case 3:
+              Navigator.pushNamed(context, '/pomodoro');
+              break;
+            case 4:
+              break; // Já está na tela de estatísticas
+          }
+        },
+        backgroundColor: const Color(0xFF2E8B57),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Agenda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.credit_card),
+            label: 'Flashcards',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Pomodoro',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.insights),
+            label: 'Estatística',
+          ),
+        ],
+      ),
     );
   }
 
-  // Retorna uma cor com base na disciplina
-  Color _getCorDisciplina(String disciplina) {
-    // Mapeia disciplinas para cores
-    final cores = {
-      'Matemática': Colors.blue,
-      'Física': Colors.green,
-      'Química': Colors.orange,
-      'História': Colors.red,
-      'Geografia': Colors.purple,
-      'Inglês': Colors.teal,
-    };
-    return cores[disciplina] ?? Colors.grey; // Retorna cinza se a disciplina não estiver mapeada
+  // Define a cor com base na posição da disciplina (do maior para o menor tempo estudado)
+  Color _getCorPorPosicao(int posicao) {
+    final cores = [
+      Colors.blue, // Cor para a disciplina com mais tempo estudado
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+      Colors.teal,
+      Colors.cyan,
+      Colors.pink,
+      Colors.indigo,
+      Colors.amber,
+    ];
+    return posicao < cores.length
+        ? cores[posicao]
+        : Colors.grey; // Cinza para as demais
   }
 }

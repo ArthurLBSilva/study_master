@@ -15,9 +15,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final AuthService _authService = AuthService();
 
   // Cores salvas em variáveis para fácil manutenção
-  final Color _primaryColor = Color(0xFF2E8B57); // Verde principal
-  final Color _backgroundColor = Color(0xFFE8F5E9); // Verde claro de fundo
-  final Color _textColor = Colors.white; // Cor do texto
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _secundaryColor = Color(0xFF09c184); // Verde vibrante
+  final Color _textColor = Colors.black; // Cor do texto no card
+  final Color _primaryColor = Color(0xFF0a8967); // Verde escuro para a AppBar
+  final Color _appBarColor = Color(0xFF0C5149);
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -58,20 +60,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'Cadastro',
           style: TextStyle(
             fontFamily: 'Poppins',
-            color: _textColor,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: _primaryColor,
+        backgroundColor: _appBarColor,
+        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('lib/assets/study_background.jpg'), // Imagem de fundo
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.3), // Opacidade da imagem
-              BlendMode.darken,
-            ),
+          gradient: LinearGradient(
+            colors: [_backgroundColor, _backgroundColor, _secundaryColor],
+            stops: [0.0, 0.7, 1.0], // A parte escura ocupa 70% do espaço
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Center(
@@ -82,6 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Form(
@@ -103,12 +106,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
+                          labelStyle: TextStyle(color: _textColor),
                           prefixIcon: Icon(Icons.email, color: _primaryColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
                           ),
-                          labelStyle: TextStyle(fontFamily: 'Poppins'),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
+                          ),
                         ),
+                        style: TextStyle(color: _textColor),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira um email';
@@ -121,12 +130,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _passwordController,
                         decoration: InputDecoration(
                           labelText: 'Senha',
+                          labelStyle: TextStyle(color: _textColor),
                           prefixIcon: Icon(Icons.lock, color: _primaryColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
                           ),
-                          labelStyle: TextStyle(fontFamily: 'Poppins'),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
+                          ),
                         ),
+                        style: TextStyle(color: _textColor),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -143,12 +158,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _confirmPasswordController,
                         decoration: InputDecoration(
                           labelText: 'Confirmar Senha',
+                          labelStyle: TextStyle(color: _textColor),
                           prefixIcon: Icon(Icons.lock, color: _primaryColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
                           ),
-                          labelStyle: TextStyle(fontFamily: 'Poppins'),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
+                          ),
                         ),
+                        style: TextStyle(color: _textColor),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -161,21 +182,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _signUp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _primaryColor,
-                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      SizedBox(
+                        width: double.infinity, // Botão com largura total
+                        child: ElevatedButton(
+                          onPressed: _signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _primaryColor,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'Cadastrar',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            color: _textColor,
+                          child: Text(
+                            'Cadastrar',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -191,7 +215,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           'Já tem uma conta? Faça login',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            color: _primaryColor,
+                            color: _secundaryColor,
                           ),
                         ),
                       ),

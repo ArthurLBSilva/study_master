@@ -17,9 +17,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Cores salvas em variáveis para fácil manutenção
   final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
-  final Color _primaryColor = Color(0xFF09c184); // Verde vibrante
+  final Color _secundaryColor = Color(0xFF09c184); // Verde vibrante
   final Color _textColor = Colors.black; // Cor do texto no card
-  final Color _appBarColor = Color(0xFF0a8967); // Verde escuro para a AppBar
+  final Color _primaryColor = Color(0xFF0a8967); // Verde escuro para a AppBar
+  final Color _appBarColor = Color(0xFF0C5149);
+
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -56,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_backgroundColor, _backgroundColor, _appBarColor],
+            colors: [_backgroundColor, _backgroundColor, _primaryColor],
             stops: [0.0, 0.7, 1.0], // A parte escura ocupa 70% do espaço
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -91,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontFamily: 'Poppins',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: _appBarColor,
+                          color: _primaryColor,
                         ),
                       ),
                       SizedBox(height: 20),
@@ -149,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _appBarColor,
+                            backgroundColor: _primaryColor,
                             padding: EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -177,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Não tem uma conta? Cadastre-se',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            color: _primaryColor,
+                            color: _secundaryColor,
                           ),
                         ),
                       ),

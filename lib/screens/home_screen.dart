@@ -17,6 +17,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? idUsuario;
 
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde 
+  final Color _appBarColor = Color(0xFF0C5149);
+  final Color _avisoDiario = Color(0xFF256666);
+  final Color _textColor = Colors.white; // Cor do texto
+
   @override
   void initState() {
     super.initState();
@@ -142,67 +149,67 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           children: [
             Text(
-              'StudyMaster',
+              'Hoot',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 218, 218, 218),
+                color: _textColor,
               ),
             ),
             Spacer(),
             IconButton(
-              icon: Icon(Icons.logout, color: Colors.white),
+              icon: Icon(Icons.logout, color: _textColor),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF2E8B57),
+        backgroundColor: _appBarColor,
         elevation: 0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: idUsuario != null
-            ? _storeService.getCompromissosStream(idUsuario!)
-            : Stream.empty(), // Stream do Firestore
-        builder: (context, snapshot) {
-          if (idUsuario == null) {
-            return Center(
-              child: Text(
-                'Usuário não autenticado!',
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
+      body: Container(
+        color: _backgroundColor,
+        padding: const EdgeInsets.all(16.0),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: idUsuario != null
+              ? _storeService.getCompromissosStream(idUsuario!)
+              : Stream.empty(), // Stream do Firestore
+          builder: (context, snapshot) {
+            if (idUsuario == null) {
+              return Center(
+                child: Text(
+                  'Usuário não autenticado!',
+                  style: TextStyle(fontSize: 16, color: _textColor),
+                ),
+              );
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator(color: _primaryColor));
+            }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text(
-                'Nenhum compromisso cadastrado!',
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text(
+                  'Nenhum compromisso cadastrado!',
+                  style: TextStyle(fontSize: 16, color: _textColor),
+                ),
+              );
+            }
 
-          // Converte os documentos em uma lista de mapas
-          final compromissos = snapshot.data!.docs.map((doc) {
-            return {
-              'id': doc.id,
-              ...doc.data() as Map<String, dynamic>,
-            };
-          }).toList();
+            // Converte os documentos em uma lista de mapas
+            final compromissos = snapshot.data!.docs.map((doc) {
+              return {
+                'id': doc.id,
+                ...doc.data() as Map<String, dynamic>,
+              };
+            }).toList();
 
-          final avisoDiario = getAvisoDiario(compromissos);
-          final lembretes = getLembretesOrdenados(compromissos);
+            final avisoDiario = getAvisoDiario(compromissos);
+            final lembretes = getLembretesOrdenados(compromissos);
 
-          return Container(
-            color: Color.fromARGB(255, 255, 255, 255),
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Aviso Diário
@@ -210,13 +217,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     width: double.infinity, // Ocupa toda a largura disponível
                     child: Card(
-                      color: const Color.fromARGB(255, 41, 103, 45),
+                      color: _avisoDiario,
                       elevation: 4,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 8), // Margem igual aos lembretes
+                      margin: const EdgeInsets.symmetric(vertical: 8),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -228,16 +234,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   'Aviso Diário',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20, // Tamanho aumentado
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: _textColor,
                                   ),
                                 ),
                                 Row(
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.edit,
-                                          color: Colors.white, size: 20),
+                                          color: _textColor, size: 20),
                                       onPressed: () {
                                         Navigator.push(
                                           context,
@@ -249,11 +255,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       as Timestamp)
                                                   .toDate(),
                                               disciplina: avisoDiario[
-                                                  'disciplina'], // Disciplina atual
+                                                  'disciplina'],
                                               compromisso: avisoDiario[
-                                                  'compromisso'], // Compromisso atual
-                                              lembrete: avisoDiario[
-                                                  'lembrete'], // Lembrete atual
+                                                  'compromisso'],
+                                              lembrete: avisoDiario['lembrete'],
                                             ),
                                           ),
                                         );
@@ -261,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.delete,
-                                          color: Colors.white, size: 20),
+                                          color: _textColor, size: 20),
                                       onPressed: () {
                                         _confirmarExclusao(avisoDiario['id']);
                                       },
@@ -274,16 +279,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               '${avisoDiario['disciplina'] ?? 'Sem disciplina'}',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
+                                fontSize: 18, // Tamanho aumentado
+                                fontWeight: FontWeight.bold, // Negrito
+                                color: _textColor,
                               ),
                             ),
                             SizedBox(height: 8),
                             Text(
                               '${avisoDiario['compromisso'] ?? 'Sem compromisso'}',
                               style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
+                                fontSize: 16, // Tamanho aumentado
+                                color: _textColor,
                               ),
                             ),
                           ],
@@ -298,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(255, 25, 80, 28),
+                    color: _textColor,
                   ),
                 ),
                 SizedBox(height: 10),
@@ -307,40 +313,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView(
                     children: lembretes.map((lembrete) {
                       final data = (lembrete['data'] as Timestamp).toDate();
-                      final formatadorData =
-                          DateFormat('dd/MM'); // Formato da data
+                      final formatadorData = DateFormat('dd/MM'); // Formato da data
 
                       return Card(
-                        color: const Color.fromARGB(255, 44, 119, 50),
+                        color: _primaryColor,
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8), // Margem igual ao aviso diário
+                        margin: const EdgeInsets.symmetric(vertical: 8),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    formatadorData
-                                        .format(data), // Data formatada
+                                    formatadorData.format(data), // Data formatada
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: const Color.fromARGB(
-                                          255, 254, 255, 254),
+                                      fontSize: 18, // Tamanho aumentado
+                                      fontWeight: FontWeight.bold, // Negrito
+                                      color: _textColor,
                                     ),
                                   ),
                                   Row(
                                     children: [
                                       IconButton(
                                         icon: Icon(Icons.edit,
-                                            color: Colors.white, size: 20),
+                                            color: _textColor, size: 20),
                                         onPressed: () {
                                           Navigator.push(
                                             context,
@@ -351,12 +353,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 data: (lembrete['data']
                                                         as Timestamp)
                                                     .toDate(),
-                                                disciplina: lembrete[
-                                                    'disciplina'], // Disciplina atual
-                                                compromisso: lembrete[
-                                                    'compromisso'], // Compromisso atual
-                                                lembrete: lembrete[
-                                                    'lembrete'], // Lembrete atual
+                                                disciplina: lembrete['disciplina'],
+                                                compromisso: lembrete['compromisso'],
+                                                lembrete: lembrete['lembrete'],
                                               ),
                                             ),
                                           );
@@ -364,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       IconButton(
                                         icon: Icon(Icons.delete,
-                                            color: Colors.white, size: 20),
+                                            color: _textColor, size: 20),
                                         onPressed: () {
                                           _confirmarExclusao(lembrete['id']);
                                         },
@@ -377,18 +376,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 '${lembrete['disciplina'] ?? 'Sem disciplina'}',
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      const Color.fromARGB(255, 254, 255, 254),
+                                  fontSize: 18, // Tamanho aumentado
+                                  fontWeight: FontWeight.bold, // Negrito
+                                  color: _textColor,
                                 ),
                               ),
                               SizedBox(height: 8),
                               Text(
                                 '${lembrete['lembrete'] ?? 'Sem lembrete'}',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  color:
-                                      const Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 16, // Tamanho menor que os outros
+                                  color: _textColor,
                                 ),
                               ),
                             ],
@@ -399,20 +397,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        backgroundColor: const Color(0xFF2E8B57),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
+        backgroundColor: _appBarColor,
+        selectedItemColor: _textColor,
+        unselectedItemColor: _textColor.withOpacity(0.7),
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home), // Ícone de início
+            icon: Icon(Icons.home),
             label: 'Início',
           ),
           BottomNavigationBarItem(

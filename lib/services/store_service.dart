@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:study_master/services/auth_service.dart';
+import 'package:hoot/services/auth_service.dart';
 import 'dart:async';
 
 class StoreService {

@@ -1,4 +1,4 @@
-name: study_master
+name: hoot
 description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -19,18 +19,23 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^0.70.2
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/owl_logo.jpg"  # Caminho da sua imagem de ícone
 
 flutter:
   uses-material-design: true
 
   assets:
     - lib/assets/google_logo.png
-    - lib/assets/study_background.jpg
+    - lib/assets/owl_logo.jpg
 
   fonts:
     - family: Poppins

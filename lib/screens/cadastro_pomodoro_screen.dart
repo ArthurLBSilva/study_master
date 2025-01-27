@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:study_master/screens/cronometro_screen.dart';
+import 'package:hoot/screens/cronometro_screen.dart';
 import '../services/store_service.dart'; // Importe o StoreService
 import '../services/auth_service.dart'; // Importe o AuthService
 

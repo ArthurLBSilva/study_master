@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:study_master/screens/editar_agenda_screen.dart';
+import 'package:hoot/screens/editar_agenda_screen.dart';
 import '../services/store_service.dart';
 import '../services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

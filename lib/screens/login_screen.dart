@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:study_master/screens/home_screen.dart';
-import 'package:study_master/screens/sign_up_screen.dart';
+import 'package:hoot/screens/home_screen.dart';
+import 'package:hoot/screens/sign_up_screen.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,9 +16,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
 
   // Cores salvas em variáveis para fácil manutenção
-  final Color _primaryColor = Color(0xFF2E8B57); // Verde principal
-  final Color _backgroundColor = Color(0xFFE8F5E9); // Verde claro de fundo
-  final Color _textColor = Colors.white; // Cor do texto
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF09c184); // Verde vibrante
+  final Color _textColor = Colors.black; // Cor do texto no card
+  final Color _appBarColor = Color(0xFF0a8967); // Verde escuro para a AppBar
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -45,20 +46,20 @@ class _LoginScreenState extends State<LoginScreen> {
           'Login',
           style: TextStyle(
             fontFamily: 'Poppins',
-            color: _textColor,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: _primaryColor,
+        backgroundColor: _appBarColor,
+        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('lib/assets/study_background.jpg'), // Imagem de fundo
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.3), // Opacidade da imagem
-              BlendMode.darken,
-            ),
+          gradient: LinearGradient(
+            colors: [_backgroundColor, _backgroundColor, _appBarColor],
+            stops: [0.0, 0.7, 1.0], // A parte escura ocupa 70% do espaço
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Center(
@@ -69,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Form(
@@ -76,13 +78,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Logo da Coruja
+                      Image.asset(
+                        'lib/assets/owl_logo.jpg', // Caminho da imagem da coruja
+                        height: 100, // Altura da logo
+                        width: 100, // Largura da logo
+                      ),
+                      SizedBox(height: 16),
                       Text(
-                        'Bem-vindo ao Study Master',
+                        'Bem-vindo ao Hoot',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: _primaryColor,
+                          color: _appBarColor,
                         ),
                       ),
                       SizedBox(height: 20),
@@ -90,11 +99,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
+                          labelStyle: TextStyle(color: _textColor),
+                          prefixIcon: Icon(Icons.email, color: _textColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
                           ),
                         ),
+                        style: TextStyle(color: _textColor),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira um email';
@@ -107,11 +123,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         decoration: InputDecoration(
                           labelText: 'Senha',
-                          prefixIcon: Icon(Icons.lock),
+                          labelStyle: TextStyle(color: _textColor),
+                          prefixIcon: Icon(Icons.lock, color: _textColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: _textColor),
                           ),
                         ),
+                        style: TextStyle(color: _textColor),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -121,21 +144,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _primaryColor,
-                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      SizedBox(
+                        width: double.infinity, // Botão com largura total
+                        child: ElevatedButton(
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _appBarColor,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            color: _textColor,
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -156,53 +182,56 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final userCredential = await AuthService().signInWithGoogle();
-                          if (userCredential != null) {
-                            final user = userCredential.user;
-                            if (user != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
+                      SizedBox(
+                        width: double.infinity, // Botão com largura total
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final userCredential = await AuthService().signInWithGoogle();
+                            if (userCredential != null) {
+                              final user = userCredential.user;
+                              if (user != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeScreen(),
+                                  ),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Login com Google cancelado ou falhou.'),
                                 ),
                               );
                             }
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Login com Google cancelado ou falhou.'),
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 3,
                           ),
-                          elevation: 3,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'lib/assets/google_logo.png', // Certifique-se de configurar o asset
-                              height: 24,
-                              width: 24,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Login com Google',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                                color: Colors.black,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'lib/assets/google_logo.png',
+                                height: 24,
+                                width: 24,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 8),
+                              Text(
+                                'Login com Google',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],

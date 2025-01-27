@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:study_master/screens/cadastro_flashcard_screen.dart';
-import 'package:study_master/screens/cadastro_planejamento_screen.dart';
-import 'package:study_master/screens/cadastro_pomodoro_screen.dart';
-import 'package:study_master/screens/editar_agenda_screen.dart';
-import 'package:study_master/screens/estatistica_screen.dart';
-import 'package:study_master/screens/flashcard_screen.dart';
-import 'package:study_master/screens/home_screen.dart';
-import 'package:study_master/screens/login_screen.dart';
-import 'package:study_master/screens/planejamento_screen.dart';
-import 'package:study_master/screens/pomodoro_screen.dart';
-import 'package:study_master/screens/sign_up_screen.dart';
+import 'package:hoot/screens/cadastro_flashcard_screen.dart';
+import 'package:hoot/screens/cadastro_planejamento_screen.dart';
+import 'package:hoot/screens/cadastro_pomodoro_screen.dart';
+import 'package:hoot/screens/editar_agenda_screen.dart';
+import 'package:hoot/screens/estatistica_screen.dart';
+import 'package:hoot/screens/flashcard_screen.dart';
+import 'package:hoot/screens/home_screen.dart';
+import 'package:hoot/screens/login_screen.dart';
+import 'package:hoot/screens/planejamento_screen.dart';
+import 'package:hoot/screens/pomodoro_screen.dart';
+import 'package:hoot/screens/sign_up_screen.dart';
 import 'firebase_options.dart'; // Importando o arquivo gerado pelo Firebase CLI
 import 'package:firebase_auth/firebase_auth.dart'; // Importando para autenticação
 import 'screens/auth_state_widget.dart';

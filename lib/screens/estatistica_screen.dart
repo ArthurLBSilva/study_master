@@ -15,6 +15,13 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
   String _filtro = 'Dia'; // Filtro padrão: Dia
   Map<String, double> _tempoPorDisciplina = {}; // Tempo estudado por disciplina
 
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde
+  final Color _appBarColor =
+      Color(0xFF0C5149); // Cor da AppBar e BottomNavigationBar
+  final Color _textColor = Colors.white; // Cor do texto
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +40,10 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
         dataInicio = DateTime(dataFim.year, dataFim.month, dataFim.day);
         break;
       case 'Semana':
+        // Início da semana (segunda-feira)
         dataInicio = dataFim.subtract(Duration(days: dataFim.weekday - 1));
+        dataInicio =
+            DateTime(dataInicio.year, dataInicio.month, dataInicio.day);
         break;
       case 'Mês':
         dataInicio = DateTime(dataFim.year, dataFim.month, 1);
@@ -53,8 +63,7 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
     for (var doc in querySnapshot.docs) {
       final data = doc.data();
       final disciplina = data['disciplina'] as String;
-      final tempoEstudado =
-          (data['tempoEstudado'] as num).toDouble(); // Corrigido aqui
+      final tempoEstudado = (data['tempoEstudado'] as num).toDouble();
       final dataSessao = DateTime.parse(data['dataSessao'] as String);
 
       // Verifica se a data está dentro do intervalo selecionado
@@ -110,7 +119,7 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
         final double porcentagem = (entry.value / total) * 100;
         sections.add(
           PieChartSectionData(
-            color: _getCorPorPosicao(i), // Define a cor com base na posição
+            color: Colors.transparent, // Cor de fundo transparente
             value: porcentagem,
             title: '${porcentagem.toStringAsFixed(1)}%',
             radius: 60,
@@ -119,6 +128,7 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
+            gradient: _getGradientePorPosicao(i), // Gradiente aplicado aqui
           ),
         );
       }
@@ -126,19 +136,37 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          'StudyMaster',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        automaticallyImplyLeading: false, // Remove o botão de voltar
+        title: Row(
+          children: [
+            Text(
+              'Hoot',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _textColor,
+              ),
+            ),
+            SizedBox(width: 8), // Espaço entre o texto e a imagem
+            Image.asset(
+              'lib/assets/icone_corujinha.jpg', // Substitua pelo caminho da sua imagem
+              height: 35, // Ajuste o tamanho conforme necessário
+              width: 40,
+            ),
+            Spacer(),
+            IconButton(
+              icon: Icon(Icons.logout, color: _textColor),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
         ),
-        backgroundColor: const Color(0xFF2E8B57),
+        backgroundColor: _appBarColor,
         elevation: 0,
       ),
-      body: Padding(
+      body: Container(
+        color: _backgroundColor,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -156,15 +184,14 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
                     _carregarDados();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _filtro == filtro
-                        ? const Color(0xFF2E8B57)
-                        : Colors.grey[300],
+                    backgroundColor:
+                        _filtro == filtro ? _primaryColor : Colors.grey[300],
                     padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                   child: Text(
                     filtro,
                     style: TextStyle(
-                      color: _filtro == filtro ? Colors.white : Colors.black,
+                      color: _filtro == filtro ? _textColor : Colors.black,
                     ),
                   ),
                 );
@@ -204,11 +231,20 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
                       leading: Container(
                         width: 16,
                         height: 16,
-                        color: _getCorPorPosicao(
-                            disciplinasOrdenadas.indexOf(entry)),
+                        decoration: BoxDecoration(
+                          gradient: _getGradientePorPosicao(
+                              disciplinasOrdenadas.indexOf(entry)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      title: Text(entry.key),
-                      trailing: Text(_formatarTempo(entry.value)),
+                      title: Text(
+                        entry.key,
+                        style: TextStyle(color: _textColor),
+                      ),
+                      trailing: Text(
+                        _formatarTempo(entry.value),
+                        style: TextStyle(color: _textColor),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -237,8 +273,8 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
               break; // Já está na tela de estatísticas
           }
         },
-        backgroundColor: const Color(0xFF2E8B57),
-        selectedItemColor: Colors.white,
+        backgroundColor: _appBarColor,
+        selectedItemColor: _textColor,
         unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
@@ -267,22 +303,50 @@ class _EstatisticaScreenState extends State<EstatisticaScreen> {
     );
   }
 
-  // Define a cor com base na posição da disciplina (do maior para o menor tempo estudado)
-  Color _getCorPorPosicao(int posicao) {
-    final cores = [
-      Colors.blue, // Cor para a disciplina com mais tempo estudado
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-      Colors.purple,
-      Colors.teal,
-      Colors.cyan,
-      Colors.pink,
-      Colors.indigo,
-      Colors.amber,
+  // Define um gradiente de cores com base na posição da disciplina
+  LinearGradient _getGradientePorPosicao(int posicao) {
+    final gradientes = [
+      LinearGradient(
+        colors: [
+          Color(0xFF6A1B9A),
+          Color(0xFFAB47BC)
+        ], // Roxo escuro para roxo claro
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      LinearGradient(
+        colors: [
+          Color(0xFF1565C0),
+          Color(0xFF64B5F6)
+        ], // Azul escuro para azul claro
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      LinearGradient(
+        colors: [
+          Color(0xFF2E7D32),
+          Color(0xFF66BB6A)
+        ], // Verde escuro para verde claro
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      LinearGradient(
+        colors: [
+          Color(0xFFEF6C00),
+          Color(0xFFFFA726)
+        ], // Laranja escuro para laranja claro
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      LinearGradient(
+        colors: [
+          Color(0xFFC2185B),
+          Color(0xFFE91E63)
+        ], // Rosa escuro para rosa claro
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ];
-    return posicao < cores.length
-        ? cores[posicao]
-        : Colors.grey; // Cinza para as demais
+    return gradientes[posicao % gradientes.length];
   }
 }

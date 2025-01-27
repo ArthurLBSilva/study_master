@@ -162,9 +162,10 @@ class _CadastroPomodoroScreenState extends State<CadastroPomodoroScreen> {
         backgroundColor: _appBarColor, // Cor de fundo do AppBar
       ),
       body: Container(
-        color: _backgroundColor,
-        padding: const EdgeInsets.all(16.0),
+        color: _backgroundColor, // Cor de fundo da tela
+        height: MediaQuery.of(context).size.height, // Ocupa toda a altura da tela
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

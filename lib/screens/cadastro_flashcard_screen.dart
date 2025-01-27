@@ -16,6 +16,13 @@ class _CadastroFlashcardScreenState extends State<CadastroFlashcardScreen> {
   final AuthService _authService = AuthService(); // Instância do AuthService
 
   List<String> _disciplinas = []; // Lista de disciplinas
+  String? _disciplinaSelecionada; // Disciplina selecionada
+
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde
+  final Color _appBarColor = Color(0xFF0C5149); // Cor da AppBar
+  final Color _textColor = Colors.white; // Cor do texto
 
   @override
   void initState() {
@@ -42,6 +49,7 @@ class _CadastroFlashcardScreenState extends State<CadastroFlashcardScreen> {
   void _mostrarListaDisciplinas() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: _backgroundColor,
       builder: (context) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -53,6 +61,7 @@ class _CadastroFlashcardScreenState extends State<CadastroFlashcardScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 16),
@@ -63,9 +72,13 @@ class _CadastroFlashcardScreenState extends State<CadastroFlashcardScreen> {
                   itemBuilder: (context, index) {
                     final disciplina = _disciplinas[index];
                     return ListTile(
-                      title: Text(disciplina),
+                      title: Text(
+                        disciplina,
+                        style: TextStyle(color: _textColor),
+                      ),
                       onTap: () {
                         setState(() {
+                          _disciplinaSelecionada = disciplina;
                           _disciplinaController.text = disciplina;
                         });
                         Navigator.pop(context); // Fecha o modal
@@ -154,110 +167,132 @@ class _CadastroFlashcardScreenState extends State<CadastroFlashcardScreen> {
             color: Colors.white, // Cor do texto em branco
           ),
         ),
-        backgroundColor: const Color(0xFF2E8B57), // Cor de fundo do AppBar
+        backgroundColor: _appBarColor, // Cor de fundo do AppBar
       ),
-      body: SingleChildScrollView(
-        // Permite rolar a tela
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 24), // Espaçamento maior entre a AppBar e o campo
-            // Campo de Disciplina
-            InkWell(
-              onTap: _mostrarListaDisciplinas, // Abre o modal de disciplinas
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  labelText: 'Disciplina*',
-                  border: OutlineInputBorder(),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _disciplinaController.text.isEmpty
-                          ? 'Selecione uma disciplina'
-                          : _disciplinaController.text,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: _disciplinaController.text.isEmpty
-                            ? Colors.grey
-                            : Colors.black,
+      body: Container(
+        color: _backgroundColor, // Cor de fundo da tela
+        height: MediaQuery.of(context).size.height, // Ocupa toda a altura da tela
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 24), // Espaçamento maior entre a AppBar e o campo
+              // Campo de Disciplina
+              InkWell(
+                onTap: _mostrarListaDisciplinas, // Abre o modal de disciplinas
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'Disciplina*',
+                    labelStyle: TextStyle(color: _textColor),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: _primaryColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: _primaryColor),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _disciplinaSelecionada ?? 'Selecione uma disciplina',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: _disciplinaSelecionada == null
+                              ? Colors.grey
+                              : _textColor,
+                        ),
                       ),
-                    ),
-                    Icon(Icons.arrow_drop_down),
-                  ],
+                      Icon(Icons.arrow_drop_down, color: _textColor),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 24), // Espaçamento maior entre os campos
-            // Campo de Pergunta
-            TextField(
-              controller: _perguntaController,
-              decoration: InputDecoration(
-                labelText: 'Pergunta*',
-                hintText: 'Ex: Qual é a capital da França?',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 24), // Espaçamento maior entre os campos
-            // Campo de Resposta (maior)
-            Container(
-              height: 150, // Altura maior para o campo de resposta
-              child: TextField(
-                controller: _respostaController,
-                maxLines: null, // Permite múltiplas linhas
-                expands: true, // Expande para ocupar o espaço disponível
+              SizedBox(height: 24), // Espaçamento maior entre os campos
+              // Campo de Pergunta
+              TextField(
+                controller: _perguntaController,
+                style: TextStyle(color: _textColor),
                 decoration: InputDecoration(
-                  labelText: 'Resposta*',
-                  hintText: 'Ex: Paris',
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true, // Alinha o label com o texto
+                  labelText: 'Pergunta*',
+                  labelStyle: TextStyle(color: _textColor),
+                  hintText: 'Ex: Qual é a capital da França?',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 32), // Espaçamento maior antes dos botões
-            // Botões de Salvar e Cancelar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Volta para a tela anterior
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey, // Cor do botão Cancelar
-                      padding: EdgeInsets.symmetric(vertical: 16),
+              SizedBox(height: 24), // Espaçamento maior entre os campos
+              // Campo de Resposta (maior)
+              Container(
+                height: 150, // Altura maior para o campo de resposta
+                child: TextField(
+                  controller: _respostaController,
+                  style: TextStyle(color: _textColor),
+                  maxLines: null, // Permite múltiplas linhas
+                  expands: true, // Expande para ocupar o espaço disponível
+                  decoration: InputDecoration(
+                    labelText: 'Resposta*',
+                    labelStyle: TextStyle(color: _textColor),
+                    hintText: 'Ex: Paris',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: _primaryColor),
                     ),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        color: Colors.white, // Cor do texto em branco
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: _primaryColor),
+                    ),
+                    alignLabelWithHint: true, // Alinha o label com o texto
+                  ),
+                ),
+              ),
+              SizedBox(height: 32), // Espaçamento maior antes dos botões
+              // Botões de Salvar e Cancelar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Volta para a tela anterior
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey, // Cor do botão Cancelar
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          color: _textColor, // Cor do texto em branco
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _salvarFlashcard,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFF2E8B57), // Cor do botão Salvar
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      'Salvar',
-                      style: TextStyle(
-                        color: Colors.white, // Cor do texto em branco
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _salvarFlashcard,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _primaryColor, // Cor do botão Salvar
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        'Salvar',
+                        style: TextStyle(
+                          color: _textColor, // Cor do texto em branco
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

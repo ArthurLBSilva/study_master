@@ -20,6 +20,12 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
   final AuthService _authService = AuthService();
   Map<DateTime, bool> _agendamentos = {}; // Armazena apenas se há agendamento
 
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde 
+  final Color _appBarColor = Color(0xFF0C5149);
+  final Color _textColor = Colors.white; // Cor do texto
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +83,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
 
       showModalBottomSheet(
         context: context,
+        backgroundColor: _backgroundColor,
         builder: (context) {
           return Container(
             padding: EdgeInsets.all(16),
@@ -89,12 +96,14 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: _textColor,
                   ),
                 ),
                 SizedBox(height: 16),
 
                 // Card com as informações
                 Card(
+                  color: _primaryColor,
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: Column(
@@ -106,6 +115,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: _textColor,
                           ),
                         ),
                         SizedBox(height: 8),
@@ -114,14 +124,14 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                         if (agendamento['lembrete'] != null)
                           Text(
                             'Lembrete: ${agendamento['lembrete']}',
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(fontSize: 14, color: _textColor),
                           ),
 
                         // Compromisso
                         if (agendamento['compromisso'] != null)
                           Text(
                             'Compromisso: ${agendamento['compromisso']}',
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(fontSize: 14, color: _textColor),
                           ),
                       ],
                     ),
@@ -135,7 +145,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                   children: [
                     // Botão de adicionar
                     IconButton(
-                      icon: Icon(Icons.add),
+                      icon: Icon(Icons.add, color: _textColor),
                       onPressed: () {
                         Navigator.pop(context); // Fecha o modal
                         Navigator.pushNamed(
@@ -148,7 +158,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
 
                     // Botão de editar
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: Icon(Icons.edit, color: _textColor),
                       onPressed: () {
                         Navigator.pop(context); // Fecha o modal
                         Navigator.push(
@@ -207,26 +217,33 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
         title: Row(
           children: [
             Text(
-              'StudyMaster',
+              'Hoot',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 218, 218, 218),
+                color: _textColor,
               ),
+            ),
+            SizedBox(width: 8), // Espaço entre o texto e a imagem
+            Image.asset(
+              'lib/assets/icone_corujinha.jpg', // Substitua pelo caminho da sua imagem
+              height: 35, // Ajuste o tamanho conforme necessário
+              width: 40,
             ),
             Spacer(),
             IconButton(
-              icon: Icon(Icons.logout, color: Colors.white),
+              icon: Icon(Icons.logout, color: _textColor),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF2E8B57),
+        backgroundColor: _appBarColor,
         elevation: 0,
       ),
-      body: Padding(
+      body: Container(
+        color: _backgroundColor,
         padding: const EdgeInsets.only(top: 32.0),
         child: Column(
           children: [
@@ -266,37 +283,40 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
               },
               calendarStyle: CalendarStyle(
                 selectedDecoration: BoxDecoration(
-                  color: const Color(0xFF2E8B57),
+                  color: _primaryColor,
                   shape: BoxShape.circle,
                 ),
                 todayDecoration: BoxDecoration(
-                  color: const Color(0xFF2E8B57).withOpacity(0.5),
+                  color: _primaryColor.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
                 weekendTextStyle: TextStyle(color: Colors.red),
                 outsideDaysVisible: false,
+                // Ajuste para dias passados e futuros
+                defaultTextStyle: TextStyle(color: _textColor), // Dias futuros
+                disabledTextStyle: TextStyle(
+                  color: _textColor.withOpacity(0.5), // Dias passados
+                ),
               ),
               headerStyle: HeaderStyle(
                 formatButtonVisible: true,
                 titleCentered: true,
                 formatButtonShowsNext: false,
                 formatButtonDecoration: BoxDecoration(
-                  color: const Color(0xFF2E8B57),
+                  color: _primaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                formatButtonTextStyle: TextStyle(color: Colors.white),
+                formatButtonTextStyle: TextStyle(color: _textColor),
                 titleTextStyle: TextStyle(
-                  color: const Color(0xFF2E8B57),
+                  color: _textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
-                leftChevronIcon:
-                    Icon(Icons.chevron_left, color: const Color(0xFF2E8B57)),
-                rightChevronIcon:
-                    Icon(Icons.chevron_right, color: const Color(0xFF2E8B57)),
+                leftChevronIcon: Icon(Icons.chevron_left, color: _textColor),
+                rightChevronIcon: Icon(Icons.chevron_right, color: _textColor),
               ),
               daysOfWeekStyle: DaysOfWeekStyle(
-                weekdayStyle: TextStyle(color: const Color(0xFF2E8B57)),
+                weekdayStyle: TextStyle(color: _textColor),
                 weekendStyle: TextStyle(color: Colors.red),
               ),
               locale: 'pt_BR',
@@ -312,7 +332,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                   return Text(
                     '${month.toUpperCase()} $year', // Ex: JAN 2025
                     style: TextStyle(
-                      color: const Color(0xFF2E8B57),
+                      color: _textColor,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -329,7 +349,7 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
                         color: day.weekday == DateTime.saturday ||
                                 day.weekday == DateTime.sunday
                             ? Colors.red // Fim de semana em vermelho
-                            : const Color(0xFF2E8B57), // Dias úteis em verde
+                            : _textColor, // Dias úteis em branco
                       ),
                     ),
                   );
@@ -380,9 +400,9 @@ class _PlanejamentoScreenState extends State<PlanejamentoScreen> {
               break;
           }
         },
-        backgroundColor: const Color(0xFF2E8B57),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
+        backgroundColor: _appBarColor,
+        selectedItemColor: _textColor,
+        unselectedItemColor: _textColor.withOpacity(0.7),
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

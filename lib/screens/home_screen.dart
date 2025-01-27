@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Cores salvas em variáveis para fácil manutenção
   final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
-  final Color _primaryColor = Color(0xFF256666); // Verde 
+  final Color _primaryColor = Color(0xFF256666); // Verde
   final Color _appBarColor = Color(0xFF0C5149);
   final Color _avisoDiario = Color(0xFF256666);
   final Color _textColor = Colors.white; // Cor do texto
@@ -156,6 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: _textColor,
               ),
             ),
+            SizedBox(width: 8), // Espaço entre o texto e a imagem
+            Image.asset(
+              'lib/assets/icone_corujinha.jpg', // Substitua pelo caminho da sua imagem
+              height: 35, // Ajuste o tamanho conforme necessário
+              width: 40,
+            ),
             Spacer(),
             IconButton(
               icon: Icon(Icons.logout, color: _textColor),
@@ -186,7 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator(color: _primaryColor));
+              return Center(
+                  child: CircularProgressIndicator(color: _primaryColor));
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -254,10 +261,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                               data: (avisoDiario['data']
                                                       as Timestamp)
                                                   .toDate(),
-                                              disciplina: avisoDiario[
-                                                  'disciplina'],
-                                              compromisso: avisoDiario[
-                                                  'compromisso'],
+                                              disciplina:
+                                                  avisoDiario['disciplina'],
+                                              compromisso:
+                                                  avisoDiario['compromisso'],
                                               lembrete: avisoDiario['lembrete'],
                                             ),
                                           ),
@@ -313,7 +320,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView(
                     children: lembretes.map((lembrete) {
                       final data = (lembrete['data'] as Timestamp).toDate();
-                      final formatadorData = DateFormat('dd/MM'); // Formato da data
+                      final formatadorData =
+                          DateFormat('dd/MM'); // Formato da data
 
                       return Card(
                         color: _primaryColor,
@@ -328,10 +336,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    formatadorData.format(data), // Data formatada
+                                    formatadorData
+                                        .format(data), // Data formatada
                                     style: TextStyle(
                                       fontSize: 18, // Tamanho aumentado
                                       fontWeight: FontWeight.bold, // Negrito
@@ -353,8 +363,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 data: (lembrete['data']
                                                         as Timestamp)
                                                     .toDate(),
-                                                disciplina: lembrete['disciplina'],
-                                                compromisso: lembrete['compromisso'],
+                                                disciplina:
+                                                    lembrete['disciplina'],
+                                                compromisso:
+                                                    lembrete['compromisso'],
                                                 lembrete: lembrete['lembrete'],
                                               ),
                                             ),

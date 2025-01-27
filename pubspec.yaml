@@ -36,6 +36,7 @@ flutter:
   assets:
     - lib/assets/google_logo.png
     - lib/assets/owl_logo.jpg
+    - lib/assets/icone_corujinha.jpg
 
   fonts:
     - family: Poppins

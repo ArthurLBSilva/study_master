@@ -9,13 +9,22 @@ class PomodoroScreen extends StatefulWidget {
 }
 
 class _PomodoroScreenState extends State<PomodoroScreen> {
-  final StoreService _storeService = StoreService(); // Instância do StoreService
+  final StoreService _storeService =
+      StoreService(); // Instância do StoreService
   final AuthService _authService = AuthService(); // Instância do AuthService
 
   List<String> _disciplinas = []; // Lista de disciplinas
   String? _disciplinaSelecionada; // Disciplina selecionada
-  List<Map<String, dynamic>> _estudosRealizados = []; // Lista de estudos realizados
+  List<Map<String, dynamic>> _estudosRealizados =
+      []; // Lista de estudos realizados
   bool _isLoading = false; // Indicador de carregamento
+
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde
+  final Color _appBarColor =
+      Color(0xFF0C5149); // Cor da AppBar e BottomNavigationBar
+  final Color _textColor = Colors.white; // Cor do texto
 
   @override
   void initState() {
@@ -74,6 +83,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   void _mostrarListaDisciplinas() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: _backgroundColor,
       builder: (context) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -85,6 +95,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 16),
@@ -95,7 +106,10 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                   itemBuilder: (context, index) {
                     final disciplina = _disciplinas[index];
                     return ListTile(
-                      title: Text(disciplina),
+                      title: Text(
+                        disciplina,
+                        style: TextStyle(color: _textColor),
+                      ),
                       onTap: () {
                         setState(() {
                           _disciplinaSelecionada = disciplina;
@@ -136,19 +150,37 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'StudyMaster',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 218, 218, 218),
-          ),
+        automaticallyImplyLeading: false, // Remove o botão de voltar
+        title: Row(
+          children: [
+            Text(
+              'Hoot',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: _textColor,
+              ),
+            ),
+            SizedBox(width: 8), // Espaço entre o texto e a imagem
+            Image.asset(
+              'lib/assets/icone_corujinha.jpg', // Substitua pelo caminho da sua imagem
+              height: 35, // Ajuste o tamanho conforme necessário
+              width: 40,
+            ),
+            Spacer(),
+            IconButton(
+              icon: Icon(Icons.logout, color: _textColor),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
         ),
-        backgroundColor: const Color(0xFF2E8B57),
+        backgroundColor: _appBarColor,
         elevation: 0,
-        automaticallyImplyLeading: false, // Remove a seta de voltar
       ),
-      body: Padding(
+      body: Container(
+        color: _backgroundColor,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -158,7 +190,13 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Selecione a disciplina',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: _textColor),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -167,10 +205,12 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                       _disciplinaSelecionada ?? 'Selecione uma disciplina',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _disciplinaSelecionada == null ? Colors.grey : Colors.black,
+                        color: _disciplinaSelecionada == null
+                            ? Colors.grey
+                            : _textColor,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    Icon(Icons.arrow_drop_down, color: _textColor),
                   ],
                 ),
               ),
@@ -179,7 +219,8 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
             // Lista de estudos realizados
             Expanded(
               child: _isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: CircularProgressIndicator(color: _primaryColor))
                   : _estudosRealizados.isEmpty
                       ? Center(
                           child: Text(
@@ -200,6 +241,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                             final tempoEstudado = estudo['tempoEstudado'];
 
                             return Card(
+                              color: _primaryColor,
                               margin: EdgeInsets.only(bottom: 16),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -208,10 +250,12 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                                   children: [
                                     if (dataSessao != null)
                                       Text(
-                                        DateFormat('dd/MM/yyyy').format(dataSessao),
+                                        DateFormat('dd/MM/yyyy')
+                                            .format(dataSessao),
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
+                                          color: _textColor,
                                         ),
                                       ),
                                     SizedBox(height: 8),
@@ -229,25 +273,16 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
                           },
                         ),
             ),
-            // Botão de cadastrar Pomodoro
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/cadastro_pomodoro');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E8B57),
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: Text(
-                'Cadastrar Pomodoro',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ],
         ),
+      ),
+      // Botão flutuante para cadastrar Pomodoro
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/cadastro_pomodoro');
+        },
+        backgroundColor: _primaryColor,
+        child: Icon(Icons.add, color: _textColor),
       ),
       // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
@@ -271,8 +306,8 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
               break;
           }
         },
-        backgroundColor: const Color(0xFF2E8B57),
-        selectedItemColor: Colors.white,
+        backgroundColor: _appBarColor,
+        selectedItemColor: _textColor,
         unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[

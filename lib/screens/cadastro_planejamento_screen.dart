@@ -23,6 +23,13 @@ class _CadastroPlanejamentoScreenState
   final AuthService _authService = AuthService(); // Instância do AuthService
 
   List<String> _disciplinas = []; // Lista de disciplinas
+  String? _disciplinaSelecionada; // Disciplina selecionada
+
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde 
+  final Color _appBarColor = Color(0xFF0C5149);
+  final Color _textColor = Colors.white; // Cor do texto
 
   @override
   void initState() {
@@ -49,6 +56,7 @@ class _CadastroPlanejamentoScreenState
   void _mostrarListaDisciplinas() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: _backgroundColor,
       builder: (context) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -60,6 +68,7 @@ class _CadastroPlanejamentoScreenState
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 16),
@@ -70,9 +79,13 @@ class _CadastroPlanejamentoScreenState
                   itemBuilder: (context, index) {
                     final disciplina = _disciplinas[index];
                     return ListTile(
-                      title: Text(disciplina),
+                      title: Text(
+                        disciplina,
+                        style: TextStyle(color: _textColor),
+                      ),
                       onTap: () {
                         setState(() {
+                          _disciplinaSelecionada = disciplina;
                           _disciplinaController.text = disciplina;
                         });
                         Navigator.pop(context); // Fecha o modal
@@ -156,9 +169,10 @@ class _CadastroPlanejamentoScreenState
             color: Colors.white, // Cor do texto em branco
           ),
         ),
-        backgroundColor: const Color(0xFF2E8B57), // Cor de fundo do AppBar
+        backgroundColor: _appBarColor, // Cor de fundo do AppBar
       ),
-      body: Padding(
+      body: Container(
+        color: _backgroundColor,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +183,7 @@ class _CadastroPlanejamentoScreenState
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF2E8B57),
+                color: _textColor,
               ),
             ),
             SizedBox(height: 20),
@@ -179,23 +193,27 @@ class _CadastroPlanejamentoScreenState
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Disciplina*',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: _textColor),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _disciplinaController.text.isEmpty
-                          ? 'Selecione uma disciplina'
-                          : _disciplinaController.text,
+                      _disciplinaSelecionada ?? 'Selecione uma disciplina',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _disciplinaController.text.isEmpty
+                        color: _disciplinaSelecionada == null
                             ? Colors.grey
-                            : Colors.black,
+                            : _textColor,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    Icon(Icons.arrow_drop_down, color: _textColor),
                   ],
                 ),
               ),
@@ -204,20 +222,36 @@ class _CadastroPlanejamentoScreenState
             // Campo de Compromisso Diário
             TextField(
               controller: _compromissoController,
+              style: TextStyle(color: _textColor),
               decoration: InputDecoration(
                 labelText: 'Compromisso Diário',
+                labelStyle: TextStyle(color: _textColor),
                 hintText: 'Ex: Estudar Cálculo',
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: _primaryColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: _primaryColor),
+                ),
               ),
             ),
             SizedBox(height: 16),
             // Campo de Lembrete
             TextField(
               controller: _lembreteController,
+              style: TextStyle(color: _textColor),
               decoration: InputDecoration(
                 labelText: 'Lembrete',
+                labelStyle: TextStyle(color: _textColor),
                 hintText: 'Ex: Revisar Cálculo 1',
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: _primaryColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: _primaryColor),
+                ),
               ),
             ),
             SizedBox(height: 32),
@@ -234,10 +268,10 @@ class _CadastroPlanejamentoScreenState
                       backgroundColor: Colors.grey, // Cor do botão Cancelar
                       padding: EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancelar',
                       style: TextStyle(
-                        color: Colors.white, // Cor do texto em branco
+                        color: _textColor, // Cor do texto em branco
                       ),
                     ),
                   ),
@@ -247,14 +281,13 @@ class _CadastroPlanejamentoScreenState
                   child: ElevatedButton(
                     onPressed: _salvarPlanejamento,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xFF2E8B57), // Cor do botão Salvar
+                      backgroundColor: _primaryColor, // Cor do botão Salvar
                       padding: EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Salvar',
                       style: TextStyle(
-                        color: Colors.white, // Cor do texto em branco
+                        color: _textColor, // Cor do texto em branco
                       ),
                     ),
                   ),

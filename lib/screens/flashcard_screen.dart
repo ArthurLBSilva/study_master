@@ -17,6 +17,12 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   bool _isLoading = false; // Indicador de carregamento
   int _currentIndex = 2; // Índice da Bottom Navigation Bar (Flashcards)
 
+  // Cores salvas em variáveis para fácil manutenção
+  final Color _backgroundColor = Color(0xFF0d192b); // Verde azulado escuro
+  final Color _primaryColor = Color(0xFF256666); // Verde
+  final Color _appBarColor = Color(0xFF0C5149); // Cor da AppBar e BottomNavigationBar
+  final Color _textColor = Colors.white; // Cor do texto
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +71,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   void _mostrarListaDisciplinas() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: _backgroundColor,
       builder: (context) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -76,6 +83,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 16),
@@ -86,7 +94,10 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                   itemBuilder: (context, index) {
                     final disciplina = _disciplinas[index];
                     return ListTile(
-                      title: Text(disciplina),
+                      title: Text(
+                        disciplina,
+                        style: TextStyle(color: _textColor),
+                      ),
                       onTap: () {
                         setState(() {
                           _disciplinaSelecionada = disciplina;
@@ -111,11 +122,13 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: _backgroundColor,
           title: Text(
             'Pergunta',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
+              color: _textColor,
             ),
           ),
           content: Column(
@@ -126,6 +139,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                 flashcard['pergunta'],
                 style: TextStyle(
                   fontSize: 18,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 20),
@@ -134,6 +148,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: _textColor,
                 ),
               ),
               SizedBox(height: 10),
@@ -151,7 +166,10 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
               onPressed: () {
                 Navigator.pop(context); // Fecha o modal
               },
-              child: Text('Fechar'),
+              child: Text(
+                'Fechar',
+                style: TextStyle(color: _primaryColor),
+              ),
             ),
           ],
         );
@@ -192,26 +210,33 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
         title: Row(
           children: [
             Text(
-              'StudyMaster',
+              'Hoot',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromARGB(255, 218, 218, 218),
+                color: _textColor,
               ),
+            ),
+            SizedBox(width: 8), // Espaço entre o texto e a imagem
+            Image.asset(
+              'lib/assets/icone_corujinha.jpg', // Substitua pelo caminho da sua imagem
+              height: 35, // Ajuste o tamanho conforme necessário
+              width: 40,
             ),
             Spacer(),
             IconButton(
-              icon: Icon(Icons.logout, color: Colors.white),
+              icon: Icon(Icons.logout, color: _textColor),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF2E8B57),
+        backgroundColor: _appBarColor,
         elevation: 0,
       ),
-      body: Padding(
+      body: Container(
+        color: _backgroundColor,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +248,13 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Selecione a disciplina',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: _textColor),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: _primaryColor),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -234,10 +265,10 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                         fontSize: 16,
                         color: _disciplinaSelecionada == null
                             ? Colors.grey
-                            : Colors.black,
+                            : _textColor,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    Icon(Icons.arrow_drop_down, color: _textColor),
                   ],
                 ),
               ),
@@ -246,7 +277,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             // Lista de flashcards
             Expanded(
               child: _isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator(color: _primaryColor))
                   : _flashcards.isEmpty
                       ? Center(
                           child: Text(
@@ -262,6 +293,7 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                           itemBuilder: (context, index) {
                             final flashcard = _flashcards[index];
                             return Card(
+                              color: _primaryColor,
                               margin: EdgeInsets.only(bottom: 16),
                               child: InkWell(
                                 onTap: () {
@@ -281,30 +313,42 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
+                                                color: _textColor,
                                               ),
                                             ),
                                           ),
                                           IconButton(
-                                            icon: Icon(Icons.delete, color: Colors.green),
+                                            icon: Icon(Icons.delete, color: _textColor),
                                             onPressed: () async {
                                               // Exibe o modal de confirmação
                                               final confirmar = await showDialog(
                                                 context: context,
                                                 builder: (context) => AlertDialog(
-                                                  title: Text('Confirmar exclusão'),
+                                                  backgroundColor: _backgroundColor,
+                                                  title: Text(
+                                                    'Confirmar exclusão',
+                                                    style: TextStyle(color: _textColor),
+                                                  ),
                                                   content: Text(
-                                                      'Tem certeza que deseja excluir este flashcard?'),
+                                                    'Tem certeza que deseja excluir este flashcard?',
+                                                    style: TextStyle(color: _textColor),
+                                                  ),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () =>
                                                           Navigator.pop(context, false),
-                                                      child: Text('Cancelar'),
+                                                      child: Text(
+                                                        'Cancelar',
+                                                        style: TextStyle(color: _textColor),
+                                                      ),
                                                     ),
                                                     TextButton(
                                                       onPressed: () =>
                                                           Navigator.pop(context, true),
-                                                      child: Text('Excluir',
-                                                          style: TextStyle(color: Colors.red)),
+                                                      child: Text(
+                                                        'Excluir',
+                                                        style: TextStyle(color: Colors.red),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -317,16 +361,24 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
                                                       flashcard['id']);
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                        content: Text(
-                                                            'Flashcard excluído com sucesso!')),
+                                                      content: Text(
+                                                        'Flashcard excluído com sucesso!',
+                                                        style: TextStyle(color: _textColor),
+                                                      ),
+                                                      backgroundColor: _primaryColor,
+                                                    ),
                                                   );
                                                   // Recarrega a lista de flashcards
                                                   _carregarFlashcards();
                                                 } catch (e) {
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                        content: Text(
-                                                            'Erro ao excluir flashcard: $e')),
+                                                      content: Text(
+                                                        'Erro ao excluir flashcard: $e',
+                                                        style: TextStyle(color: _textColor),
+                                                      ),
+                                                      backgroundColor: Colors.red,
+                                                    ),
                                                   );
                                                 }
                                               }
@@ -352,15 +404,15 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
           // Recarrega os flashcards ao voltar para a tela
           _carregarFlashcards();
         },
-        backgroundColor: const Color(0xFF2E8B57),
-        child: Icon(Icons.add, color: Colors.white),
+        backgroundColor: _primaryColor,
+        child: Icon(Icons.add, color: _textColor),
       ),
       // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
-        backgroundColor: const Color(0xFF2E8B57),
-        selectedItemColor: Colors.white,
+        backgroundColor: _appBarColor,
+        selectedItemColor: _textColor,
         unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
